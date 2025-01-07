@@ -1,0 +1,6 @@
+[
+    {
+        "name":"SalesOrder",
+        "path":"data/SalesOrder.parquet"
+    }
+]
