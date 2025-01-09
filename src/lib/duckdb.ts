@@ -2,7 +2,7 @@ import { base } from '$app/paths';
 import * as duckdb from '@duckdb/duckdb-wasm';
 import duckdb_wasm from '/node_modules/@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url';
 import duckdb_worker from '/node_modules/@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?worker';
-import datasets from '$lib/config/datasets.json';
+import data_sources from '$lib/config/data_sources.json';
 
 import type { AsyncDuckDB } from '@duckdb/duckdb-wasm';
 
@@ -47,10 +47,10 @@ export async function queryData(tableName) {
     }
 }
 
-async function createTable(dataset) {
+async function createTable(data_source) {
     try {
-        const tableName = dataset.name;
-        const filePath = dataset.path;
+        const tableName = data_source.name;
+        const filePath = data_source.path;
         console.log(`Loading ${tableName} from ${filePath}`);
         const db = await instantiateDuckDb();
         await db.registerFileURL(`${tableName}.parquet`, `${base}/${filePath}`, 4, false);
@@ -59,19 +59,19 @@ async function createTable(dataset) {
         await conn.close();
         console.log(`Successfully loaded ${tableName}`);
     } catch (error) {
-        console.error(`Error loading table ${dataset.name}:`, error);
+        console.error(`Error loading table ${data_source.name}:`, error);
         throw error;
     }
 }
 
 export async function loadData() {
     try {
-        for (const dataset of datasets) {
-            await createTable(dataset);
+        for (const data_source of data_sources) {
+            await createTable(data_source);
         }
-        console.log("All datasets loaded successfully.");
+        console.log("All data_sources loaded successfully.");
     } catch (error) {
-        console.error("Error loading datasets:", error);
+        console.error("Error loading data_sources:", error);
         throw error;
     }
 }
