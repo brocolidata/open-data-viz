@@ -4,10 +4,16 @@
 	import DataTable from "$lib/components/data/table.svelte";
 	import { onMount } from 'svelte'
 	import { loadData } from "$lib/duckdb"
+	// import { loadDataSync } from "$lib/duckdb"
+	import { DoubleBounce } from 'svelte-loading-spinners';
+	import * as Card from "$lib/components/ui/card/index.js";
+    // import { writable } from "svelte/store";
+
 
 	let tableName = $state();
 	let renderedData = $state(false);
-
+	let appIsReady = $state();
+	
 	function clearTableTag() {
 		renderedData = false;
 	}
@@ -16,21 +22,9 @@
 		renderedData = true
     }
 	
-	onMount(() => {
-		loadData();
-	});
-
+	
+	// onMount(() => {
+	// 	appIsReady = loadData();
+	// });
+	
 </script>
-
-
-<h1>Duck DB Svelte-kit demo</h1>
-
-<form class="flex w-full max-w-sm items-center space-x-2">
-	<Input id="table-name" bind:value={tableName} placeholder="table name" />
-	<Button type="submit" variant="secondary" onclick={() => displayTable()}>Query Data</Button>
-  </form>
-<Button variant="destructive" onclick={() => clearTableTag()}>Clear Query</Button>
-
-{#if renderedData}
-	<DataTable {tableName} />
-{/if}

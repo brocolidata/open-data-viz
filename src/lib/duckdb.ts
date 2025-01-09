@@ -1,79 +1,102 @@
-
-
-
-
-
-
-// Based off this example for using DuckDB-Wasm with SvelteKit:
-// https://github.com/duckdb-wasm-examples/sveltekit-typescript
-
-// I think this code needs to be kept apart from the App.svelte to function?
-// Either way, it's neater to keep the worker and logger imports separate from everything else
-
 import { base } from '$app/paths';
-
-
 import * as duckdb from '@duckdb/duckdb-wasm';
-
 import duckdb_wasm from '/node_modules/@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url';
 import duckdb_worker from '/node_modules/@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?worker';
+import datasets from '$lib/config/datasets.json';
 
-import datasets from '$lib/config/datasets.json'
+import type { AsyncDuckDB } from '@duckdb/duckdb-wasm';
 
-import type {
-    AsyncDuckDB
-} from '@duckdb/duckdb-wasm'
+let db: AsyncDuckDB | null = null;
 
+const instantiateDuckDb = (() => {
+    let dbPromise: Promise<AsyncDuckDB> | null = null;
 
-let db : AsyncDuckDB | null = null;
+    return async () => {
+        if (db) return db;
+        if (dbPromise) return dbPromise;
 
+        const logger = new duckdb.ConsoleLogger();
+        const worker = new duckdb_worker();
 
-const instantiateDuckDb = async () => {
-    if (db) {
-        return db; // Return existing database, if any
-    }
-    
-    // Instantiate worker 
-    const logger = new duckdb.ConsoleLogger();
-    const worker = new duckdb_worker();
+        dbPromise = new Promise(async (resolve, reject) => {
+            try {
+                db = new duckdb.AsyncDuckDB(logger, worker);
+                await db.instantiate(duckdb_wasm);
+                resolve(db);
+            } catch (err) {
+                reject(err);
+            }
+        });
 
-    // and asynchronous database
-    db = new duckdb.AsyncDuckDB(logger, worker);
-    await db.instantiate(duckdb_wasm)
-    return db;
-};
+        return dbPromise;
+    };
+})();
 
 export async function queryData(tableName) {
-    console.log(`Querying ${tableName}..`)
-    const db = await instantiateDuckDb();
-    const conn = await db.connect();
-    const results = conn.query(`
-        SELECT * FROM ${tableName}
-    `);
-    const data = await results;
-    await conn.close();
-    console.log(data)
-    return data
+    try {
+        console.log(`Querying ${tableName}...`);
+        const db = await instantiateDuckDb();
+        const conn = await db.connect();
+        const results = await conn.query(`SELECT * FROM ${tableName}`);
+        await conn.close();
+        console.log(results);
+        return results;
+    } catch (error) {
+        console.error(`Error querying ${tableName}:`, error);
+        throw error;
+    }
 }
 
 async function createTable(dataset) {
-    const tableName = dataset.name;
-    const filePath = dataset.path;
-    console.log(`Loading ${tableName} at path ${filePath}`);
-    // A simple case of a db of a single parquet file.
-    const db = await instantiateDuckDb();
-    await db.registerFileURL(`${tableName}.parquet`, `${base}/${filePath}`, 4, false);
-    const conn = await db.connect();
-    await conn.query(`CREATE TABLE ${tableName} AS SELECT * FROM parquet_scan('${tableName}.parquet')`);
-    console.log(`Successfully loaded ${tableName} data in DuckDB`);
-    await conn.close()
+    try {
+        const tableName = dataset.name;
+        const filePath = dataset.path;
+        console.log(`Loading ${tableName} from ${filePath}`);
+        const db = await instantiateDuckDb();
+        await db.registerFileURL(`${tableName}.parquet`, `${base}/${filePath}`, 4, false);
+        const conn = await db.connect();
+        await conn.query(`CREATE TABLE ${tableName} AS SELECT * FROM parquet_scan('${tableName}.parquet')`);
+        await conn.close();
+        console.log(`Successfully loaded ${tableName}`);
+    } catch (error) {
+        console.error(`Error loading table ${dataset.name}:`, error);
+        throw error;
+    }
 }
 
 export async function loadData() {
-    for (const dataset of datasets) {
-        await createTable(dataset);
-    };
+    try {
+        for (const dataset of datasets) {
+            await createTable(dataset);
+        }
+        console.log("All datasets loaded successfully.");
+    } catch (error) {
+        console.error("Error loading datasets:", error);
+        throw error;
+    }
 }
 
+export function initializeApp() {
+    return new Promise((resolve, reject) => {
+        loadData()
+            .then(() => {
+                console.log("Data loading completed.");
+                resolve();
+            })
+            .catch((error) => {
+                console.error("Data loading failed:", error);
+                reject(error);
+            });
+    });
+}
 
-export { instantiateDuckDb }; // so we can import this elsewhere
+export async function loadDataSync() {
+    try {
+        await initializeApp();
+        console.log("App is ready for user interaction.");
+        return true;
+        // Initialize UI or other components here.
+    } catch (error) {
+        console.error("Failed to initialize app:", error);
+    }
+}
