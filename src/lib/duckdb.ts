@@ -2,7 +2,7 @@ import { base } from '$app/paths';
 import * as duckdb from '@duckdb/duckdb-wasm';
 import duckdb_wasm from '/node_modules/@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url';
 import duckdb_worker from '/node_modules/@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?worker';
-import data_sources from '$lib/config/data_sources.json';
+import { getDataSources } from './odv_config';
 
 import type { AsyncDuckDB } from '@duckdb/duckdb-wasm';
 
@@ -39,10 +39,25 @@ export async function queryData(tableName) {
         const conn = await db.connect();
         const results = await conn.query(`SELECT * FROM ${tableName}`);
         await conn.close();
-        console.log(results);
+        console.log('Logging results', results);
         return results;
     } catch (error) {
         console.error(`Error querying ${tableName}:`, error);
+        throw error;
+    }
+}
+
+export async function getDataByQuery(query) {
+    try {
+        console.log('Running the following query:', query);
+        const db = await instantiateDuckDb();
+        const conn = await db.connect();
+        const results = await conn.query(query);
+        await conn.close();
+        console.log('Logging results', results);
+        return results;
+    } catch (error) {
+        console.error('Error when running query:', error);
         throw error;
     }
 }
@@ -65,6 +80,7 @@ async function createTable(data_source) {
 }
 
 export async function loadData() {
+    const data_sources = getDataSources();
     try {
         for (const data_source of data_sources) {
             await createTable(data_source);

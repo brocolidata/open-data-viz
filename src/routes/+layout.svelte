@@ -11,23 +11,12 @@
 
 	let { children } = $props();
 
-	let tableName = $state();
-	let renderedData = $state(false);
 	let appIsReady = $state();
-	
-	function clearTableTag() {
-		renderedData = false;
-	}
-
-	function displayTable() {
-		renderedData = true
-    }
 	
 	onMount(() => {
 		appIsReady = loadData();
 	});
 </script>
-
 {#await appIsReady}
 	<!-- promise is pending -->
 	<div class="flex items-center justify-center h-screen w-screen">
@@ -50,19 +39,22 @@
 		</Card.Root>
 	</div>
 {:then value}
-	<ModeWatcher />
 	<SiteHeader />
+
+	<ModeWatcher />
+	
 	<Sidebar.Provider>
 		<AppSidebar />
-		<main>
-			<Sidebar.Trigger />
-			<div class="bg-background relative flex min-h-screen flex-col" id="page" data-vaul-drawer-wrapper>
+		
+		<main>	
+			<!-- <div class="h-screen w-screen shadow-md" id="page" data-vaul-drawer-wrapper> -->
+			<div class="w-screen h-full shadow-md" id="page">
+				<Sidebar.Trigger />	
 				{@render children?.()}
 			</div>
-			
-			
 		</main>
 	</Sidebar.Provider>
+
 	{:catch error}
 	<!-- promise was rejected -->
 	<p>Something went wrong: {error.message}</p>

@@ -1,5 +1,9 @@
 node_modules
 
+#ODV
+src/odv_configuration.json
+odv_config/
+
 # Output
 .output
 .vercel
