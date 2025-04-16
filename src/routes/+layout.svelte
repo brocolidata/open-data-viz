@@ -39,20 +39,24 @@
 		</Card.Root>
 	</div>
 {:then value}
-	<SiteHeader />
-
-	<ModeWatcher />
 	
-	<Sidebar.Provider>
+	<Sidebar.Provider open={false}>
+		<ModeWatcher />
+	
 		<AppSidebar />
+		<div>
+			<SiteHeader />
+
 		
-		<main>	
-			<!-- <div class="h-screen w-screen shadow-md" id="page" data-vaul-drawer-wrapper> -->
-			<div class="w-screen h-full shadow-md" id="page">
-				<Sidebar.Trigger />	
-				{@render children?.()}
-			</div>
-		</main>
+		
+			<main>	
+				<!-- <div class="h-screen w-screen shadow-md" id="page" data-vaul-drawer-wrapper> -->
+				<div class="w-screen h-screen shadow-md" id="page">
+					<!-- <Sidebar.Trigger />	 -->
+					{@render children?.()}
+				</div>
+			</main>
+		</div>
 	</Sidebar.Provider>
 
 	{:catch error}
