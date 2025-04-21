@@ -1,8 +1,8 @@
 <script lang="ts">
 	import * as Card from "$lib/components/ui/card/index.js";
-	import { getDashboards, getDataSources } from "$lib/odv_config";
+	import { getDashboards, getDataSources } from "$lib/utils/odv_config";
+	import {dashboardsIndex} from "$lib/utils/stores";
 
-	let dashboards = getDashboards();
 	let dataSources = getDataSources();
 
 	
@@ -13,15 +13,19 @@
 	<section>
 	  <h2 class="text-2xl font-bold mb-4">Dashboards</h2>
 	  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-		{#each dashboards as dashboard}
-			<a href="/dashboards/{dashboard.name}" class="card">
+		{#each $dashboardsIndex as dashboard}
+			<a href="/dashboard/{dashboard.name}" class="card">
 				<Card.Root >
 					<Card.Header>
 					<Card.Title>{dashboard.label}</Card.Title>
+					<!-- <Card.Description>{dashboard.description}</Card.Description> -->
 					</Card.Header>
 					<Card.Content>
-						<p>{dashboard.description}</p>
+						<p class="text-sm font-medium leading-none">{dashboard.description}</p>
 					</Card.Content>
+					<Card.Footer>
+						<p class="text-muted-foreground text-sm">{dashboard.definition_source}</p>
+					</Card.Footer>
 				</Card.Root>
 			</a>
 		{/each}
@@ -37,14 +41,17 @@
 			<h3 class="text-lg font-semibold">{source.label}</h3>
 			<p class="text-gray-600">{source.path}</p>
 		  </div> -->
-		  <a href="/data_sources/{source.name}" class="card">
+		  <a href="/data_source/{source.name}" class="card">
 			<Card.Root >
 				<Card.Header>
 				<Card.Title>{source.label}</Card.Title>
 				</Card.Header>
 				<Card.Content>
-					<p>{source.path}</p>
+					<p class="text-sm font-medium leading-none">{source.path}</p>
 				</Card.Content>
+				<Card.Footer>
+					<p class="text-muted-foreground text-sm">{source.definition_source}</p>
+				</Card.Footer>
 			</Card.Root>
 		</a>
 		{/each}

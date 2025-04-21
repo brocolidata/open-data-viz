@@ -1,6 +1,6 @@
 <script>
 	import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
-	import ChevronRight from "lucide-svelte/icons/chevron-right";
+	import ChevronRight from "@lucide/svelte/icons/chevron-right";
 	import { cn } from "$lib/utils.js";
 
 	let { ref = $bindable(null), class: className, inset, children, ...restProps } = $props();

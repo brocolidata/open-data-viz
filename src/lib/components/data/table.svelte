@@ -1,7 +1,7 @@
 <script lang="ts">
 
 	import * as Table from "$lib/components/ui/table/index.js";
-	import { queryData } from '$lib/duckdb';
+	import { queryData } from '$lib/utils/duckdb';
     let { tableName } = $props();
 	
 	function getColumns(arrowTable) {

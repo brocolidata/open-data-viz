@@ -1,7 +1,7 @@
 <script lang="ts">
     import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 
-    import { getDashboards, getDataSources } from "$lib/odv_config";
+    import { getDashboards, getDataSources } from "$lib/utils/odv_config";
 
     let activeSection = $state('section-')
 

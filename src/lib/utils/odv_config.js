@@ -1,4 +1,4 @@
-import config from '../odv_configuration.json';
+import config from '../../odv_configuration.json';
 
 export function getConfig() {
   return config;
@@ -6,7 +6,11 @@ export function getConfig() {
 
 
 export function getDataSources() {
-  return config.data_sources
+  const dataSources = config.data_sources.map(source => ({
+    ...source,
+    definition_source: 'configuration file'
+  }));
+  return dataSources;
 }
 
 export function getDataSourceByName(data_source_name) {
@@ -15,7 +19,11 @@ export function getDataSourceByName(data_source_name) {
 
 
 export function getDashboards() {
-  return config.dashboards
+  const dashboards = config.dashboards.map(dashboard => ({
+    ...dashboard,
+    definition_source: 'configuration file'
+  }));
+  return dashboards;
 }
 
 export function getDashboardByName(dashboard_name) {

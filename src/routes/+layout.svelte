@@ -5,9 +5,10 @@
 	import SiteHeader from "$lib/components/header.svelte";
 	import { ModeWatcher } from "mode-watcher";
 	import { onMount } from 'svelte'
-	import { loadData } from "$lib/duckdb"
+	import { loadData } from "$lib/utils/duckdb"
 	import { DoubleBounce } from 'svelte-loading-spinners';
 	import * as Card from "$lib/components/ui/card/index.js";
+	import { initializeDashboards } from '$lib/utils/stores'
 
 	let { children } = $props();
 
@@ -15,6 +16,7 @@
 	
 	onMount(() => {
 		appIsReady = loadData();
+		initializeDashboards();
 	});
 </script>
 {#await appIsReady}

@@ -23,7 +23,7 @@
 				</span>
 			</a>
 			<nav class="flex items-center gap-6 text-sm">
-				<a
+				<!-- <a
 					href="/dashboards"
 					class="hover:text-foreground/80 transition-colors"
 				>
@@ -34,9 +34,9 @@
 					class="hover:text-foreground/80 transition-colors"
 				>
 					Data Sources
-				</a>
+				</a> -->
 				<a
-					href="/creation"
+					href="/dashboard/new"
 					class="hover:text-foreground/80 transition-colors"
 				>
 					Creation

@@ -1,4 +1,5 @@
 import { get, writable } from 'svelte/store';
+import { getDashboards } from '$lib/utils/odv_config.js'
 
 // Initial state for dashboardsIndex
 export const dashboardsIndex = writable([]);
@@ -27,6 +28,17 @@ export const dashboardsIndex = writable([]);
  * @param {Object} dashboard - The dashboard object to add.
  * @param {string} dashboard.name - The name of the dashboard.
  */
+export function initializeDashboards() {
+  const initialStaticDashboards = getDashboards();
+  if (initialStaticDashboards && Array.isArray(initialStaticDashboards)) {
+    dashboardsIndex.update((currentDashboards) => {
+      return [...currentDashboards, ...initialStaticDashboards];
+    });
+  } else {
+    console.warn("initializeDashboards called with non-array or empty initialStaticDashboards.");
+  }
+}
+
 export function createDashboard(dashboard) {
   dashboardsIndex.update((currentDashboards) => {
       // Check if the dashboard already exists (e.g., by name) to avoid duplicates

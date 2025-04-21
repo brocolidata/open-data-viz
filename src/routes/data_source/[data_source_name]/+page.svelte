@@ -1,7 +1,7 @@
 <script>
     import { page } from '$app/stores';
-    import { getDataSourceByName } from '$lib/odv_config';
-    import { queryData } from '$lib/duckdb';
+    import { getDataSourceByName } from '$lib/utils/odv_config';
+    import { queryData } from '$lib/utils/duckdb';
     import DataTable from "$lib/components/data/table.svelte";
 
     let data_source_name = $page.params.data_source_name;
