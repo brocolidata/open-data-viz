@@ -4,24 +4,6 @@ import { getDashboards } from '$lib/utils/odv_config.js'
 // Initial state for dashboardsIndex
 export const dashboardsIndex = writable([]);
 
-// /**
-//  * Function to create a dashboard by name.
-//  * @param {object} newDashboard - The dashboard object to create.
-//  */
-// export function createDashboard(newDashboard) {
-//   dashboardsIndex.update((dashboards) => {
-//     if (!dashboards.some((dashboard) => dashboard.name === newDashboard.name)) {
-//       // Add the new dashboard object if it doesn't exist
-//       // const updatedIndex = [...dashboards, newDashboard];
-//       dashboards.push(newDashboard);
-//       console.log('Debugging updatedIndex', dashboards);
-//       return dashboards; 
-//     }
-//     console.warn(`Dashboard with name "${newDashboard.name}" already exists.`);
-//     return dashboards; // No changes if the name already exists
-//   });
-// }
-
 /**
  * Adds a new dashboard object to the dashboardsIndex store.
  * 

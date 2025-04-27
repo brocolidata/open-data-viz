@@ -51,12 +51,6 @@
         isSaving = false;
     }
 
-    // function saveDashboard() {
-    //     isSaving = true; // Set saving state
-    //     createDashboard(dashboardState);
-    //     console.log(`Successfully saved ${dashboardLabel} dashboard.`);
-    // }
-
     function dispatchEditModeToggle() {
         onEditModeToggle();
     }

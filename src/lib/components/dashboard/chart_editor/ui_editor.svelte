@@ -106,9 +106,7 @@
             seriesList,
             dimensionOnXAxis,
             chartProperties
-        }
-        console.log("chartConfiguration.configuration from ui editor:",configuration);
-        
+        }        
         onSave();
         
         // Trigger animation

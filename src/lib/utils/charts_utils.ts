@@ -143,7 +143,6 @@ export async function runChartQuery(chartQuery) {
     try {
         const arrowTable = await getDataByQuery(chartQuery);
         const columns = arrowTable.schema.fields.map((field) => field.name);
-        console.log("Columns:", columns);
         const rawRows = arrowTable.toArray();
         const rows = rawRows.map((row) => {
             const rowData = {};

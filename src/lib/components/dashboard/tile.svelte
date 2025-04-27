@@ -7,35 +7,51 @@
     import { onMount } from "svelte";
     import TileEditBar from "$lib/components/dashboard/tile_edit_bar.svelte";
     import { buildChartQuery, buildOptionsFromUI } from "$lib/utils/charts_utils";
+    import { mode } from "mode-watcher";
 
     let { remove, dataItem = $bindable(), editMode, onUpdate } = $props();
     let chart = $state();
     let chartContainer = $state();
     let datasetRows = writable([]);
     let chartConfiguration = $state(dataItem?.chartConfiguration || {});
-    $inspect('debug chartConfiguration from tile:',chartConfiguration);
-    
+    let initializedChart = $state(false);
 
     
     onMount(async () => {
-        chart = echarts.init(chartContainer);
+        chart = echarts.init(chartContainer, $mode === 'dark' ? 'dark' : undefined);
         if (chartConfiguration?.type) {
             await refreshTile();
         }
-        
-
+        initializedChart = true;
         return () => chart.dispose();
     });
 
+    mode.subscribe(
+        theme => {
+            if (initializedChart) {
+                reinitChart();
+            }
+        }
+    )
+
+    function reinitChart() {
+        disposeOfChart();   // clean current chart
+        chart = echarts.init(chartContainer, $mode === 'dark' ? undefined : 'dark');
+        refreshTile();     // redraw the chart options
+    }
+    
     function resizeChart() {
         chart.resize();
+    }
+
+    function disposeOfChart() {
+        chart.dispose();
     }
 
     async function getDatasetFromQuery(query) {
         try {
             const arrowTable = await getDataByQuery(query);
             const columns = arrowTable.schema.fields.map((field) => field.name);
-            console.log("Columns:", columns);
             const rawRows = arrowTable.toArray();
             const rows = rawRows.map((row) => {
                 const rowData = {};
@@ -44,12 +60,9 @@
                 });
                 return rowData;
             });
-            // datasetRows.set(rows);
-            // console.log("Updated datasetRows:", $datasetRows);
             return rows;
         } catch (error) {
             console.error("Error executing query:", error);
-            // datasetRows.set([]); // Set to empty on error
             return [];
         }
     }
@@ -72,8 +85,10 @@
             const { sqlQuery, chartOptions } = chartConfiguration.configuration;
             const rows = await getDatasetFromQuery(sqlQuery);
             datasetRows.set(rows);
-            const fullChartOptions = { ...chartOptions, dataset: { source: $datasetRows } };
-            console.log("fullChartOptions (advanced):", fullChartOptions);
+            const fullChartOptions = { 
+                ...chartOptions, 
+                dataset: { source: $datasetRows } 
+            };
             chart.setOption(fullChartOptions);
         } else {
             const sqlQuery = buildChartQuery(chartConfiguration.configuration);
@@ -83,7 +98,6 @@
                 ...buildOptionsFromUI(chartConfiguration.configuration),
                 dataset: { source: $datasetRows }
             };
-            console.log("fullChartOptions (ui):", fullChartOptions);
             chart.setOption(fullChartOptions);
         }
     }
