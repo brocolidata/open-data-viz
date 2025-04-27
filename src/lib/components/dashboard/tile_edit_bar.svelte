@@ -1,30 +1,25 @@
 <script>
     import { Button } from "$lib/components/ui/button";
     import * as Sheet from "$lib/components/ui/sheet/index.js";
-    import JSONEditor from "$lib/components/code_editor/json.svelte";
-    import SQLEditor from "$lib/components/code_editor/sql.svelte";
+    import * as Tabs from "$lib/components/ui/tabs/index.js";
+    import AdvancedEditor from "$lib/components/dashboard/chart_editor/advanced_editor.svelte";
+    import UiEditor from "$lib/components/dashboard/chart_editor/ui_editor.svelte";
 
     let {
         remove,
-        sqlQueryInput = $bindable(), 
-        chartOptionsInput = $bindable(),
+        chartConfiguration = $bindable(),
         onSave
     } = $props();
+    let chartConfigurationType = $state("advanced");
 
-    let sqlQueryInputContent = $state(sqlQueryInput || "");
-    let chartOptionsInputContent = $state(chartOptionsInput || {});
-
-    function saveChartOptions() {
-        chartOptionsInput = chartOptionsInputContent;
-        onSave();  
-    }
-
-    function saveChartQuery() {
-        sqlQueryInput = sqlQueryInputContent;
+    function saveChart() {
+        chartConfiguration.type = chartConfigurationType;
         onSave();
     }
-    
 
+    function switchEditor() {
+        chartConfiguration.type = chartConfigurationType;
+    }
 </script>
 
 <div class="bg-gray-100 dark:bg-gray-600 shadow p-4">
@@ -39,34 +34,26 @@
                 ✕
             </button>
         </div>
-    <Sheet.Content>
-        <Sheet.Header>
-            <Sheet.Title>Edit</Sheet.Title>
-        </Sheet.Header>
-        <div class="mt-4 max-h-[80vh] space-y-6 overflow-auto">
-            <div class="space-y-2">
-                <label
-                    for="query"
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-100"
-                    >SQL Query</label
-                >
-                <div class="h-[300px] overflow-auto">
-                    <SQLEditor bind:content={sqlQueryInputContent}/>
-                </div>
-                <Button onclick={saveChartQuery} variant="secondary">Save Query</Button>
-            </div>
-            <div class="space-y-2">
-                <label
-                    for="chart_options"
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-100"
-                    >Chart Options</label
-                >
-                <div class="h-[300px] overflow-auto">    
-                    <JSONEditor bind:content={chartOptionsInputContent}/>
-                </div>
-                <Button onclick={saveChartOptions} variant="secondary">Save Chart Options</Button>
-            </div>
-        </div>
-    </Sheet.Content>
+
+        <Tabs.Root bind:value={chartConfigurationType} onchange={switchEditor}>
+            <Sheet.Content class="overflow-y-auto h-full">
+                <Sheet.Header>
+                    <div class="w-[400px]">
+                        <Tabs.List>
+                            <Tabs.Trigger value="ui">UI Editor</Tabs.Trigger>
+                            <Tabs.Trigger value="advanced">Advanced Editor</Tabs.Trigger>
+                        </Tabs.List>
+                    </div>
+                </Sheet.Header>
+
+                <Tabs.Content value="ui">
+                    <UiEditor bind:configuration={chartConfiguration.configuration} onSave={saveChart} />
+                </Tabs.Content>
+
+                <Tabs.Content value="advanced">
+                    <AdvancedEditor bind:configuration={chartConfiguration.configuration} onSave={saveChart} />
+                </Tabs.Content>
+            </Sheet.Content>
+        </Tabs.Root>
     </Sheet.Root>
 </div>

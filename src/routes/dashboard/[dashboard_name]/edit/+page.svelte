@@ -26,7 +26,16 @@
     let dashboard = $derived(getDashboardByName(dashboardName));
     let dashboardLabel = $derived(dashboard.label);
     let dashboardDescription = $derived(dashboard.description);
-    let items = $state([]);
+    let items = $derived.by(() => {
+        if (dashboard?.tiles) {
+            return dashboard.tiles.map((tile) => ({
+                ...tile,
+                [6]: gridHelp.item(tile[6] || { x: 0, y: 0, w: 2, h: 2 }),
+            }));
+        } else {
+            return [];
+        }
+    })
     let dashboardState = $derived(dashboard);
 
     $effect(() => {

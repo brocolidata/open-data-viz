@@ -39,13 +39,23 @@ export function removeTile(items: any[], id: string, adjust = false): any[] {
   return adjust ? gridHelp.adjust(updated, COLS) : updated;
 }
 
+// export function updateTile(items: any[], updated: any): any[] {
+//   return items.map((item) =>
+//     item.id === updated.id
+//       ? {
+//           ...item,
+//           sqlQuery: updated.sqlQuery,
+//           chartOptions: updated.chartOptions,
+//         }
+//       : item
+//   );
+// }
 export function updateTile(items: any[], updated: any): any[] {
   return items.map((item) =>
     item.id === updated.id
       ? {
           ...item,
-          sqlQuery: updated.sqlQuery,
-          chartOptions: updated.chartOptions,
+          chartConfiguration: updated.chartConfiguration, // <-- NEW
         }
       : item
   );

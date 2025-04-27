@@ -15,24 +15,20 @@
     const cols = [[1200, 6]];
     let dashboardName = $page.params.dashboard_name;
     let dashboard = $derived(getDashboardByName(dashboardName));
-    let items = $state([]);
-    let editMode = false;
-
-    onMount(() => {
-        console.log("Dashboard name:", dashboardName);
-        console.log("dashboard:", dashboard);
-    });
-
-    $effect(() => {
+    $inspect("Dashboard name:", dashboardName);
+    $inspect("dashboard:", dashboard);
+    let items = $derived.by(() => {
         if (dashboard?.tiles) {
-            items = dashboard.tiles.map((tile) => ({
+            return dashboard.tiles.map((tile) => ({
                 ...tile,
                 [6]: gridHelp.item(tile[6] || { x: 0, y: 0, w: 2, h: 2 }),
             }));
         } else {
-            items = [];
+            return [];
         }
-    });
+    })
+    $inspect("debug items:", items);
+    let editMode = false;
 </script>
 
 
@@ -61,10 +57,8 @@
 <div class="w-full">
     <Grid bind:items rowHeight={100} let:item let:dataItem {cols}>
         <Tile 
-            remove={() => remove(dataItem)} 
             dataItem={dataItem} 
             {editMode}
-            onUpdate={(event) => updateTile(event)}
-            />
+        />
     </Grid>
 </div>

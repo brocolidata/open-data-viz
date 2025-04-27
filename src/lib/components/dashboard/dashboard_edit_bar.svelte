@@ -79,9 +79,8 @@
         <Popover.Content class="w-80 mt-2 p-4 bg-white dark:bg-gray-800 border rounded-md shadow-md">
             <div class="grid gap-4">
                 <div class="space-y-2">
-                    <h4 class="font-medium leading-none text-gray-900 dark:text-gray-100">Dimensions</h4>
                     <p class="text-muted-foreground text-sm text-gray-500 dark:text-gray-400">
-                        Dashboard settings.
+                        Dashboard settings
                     </p>
                 </div>
                 <div class="grid gap-2">

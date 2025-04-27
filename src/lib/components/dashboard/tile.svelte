@@ -6,46 +6,25 @@
     import { cn } from "$lib/utils.js";
     import { onMount } from "svelte";
     import TileEditBar from "$lib/components/dashboard/tile_edit_bar.svelte";
+    import { buildChartQuery, buildOptionsFromUI } from "$lib/utils/charts_utils";
 
     let { remove, dataItem = $bindable(), editMode, onUpdate } = $props();
-    let viewMode = $state("data");
-    let sqlQueryInput = $state(dataItem?.sqlQuery || "");
-    let chartOptionsInput = $state(JSON.stringify(dataItem?.chartOptions || {}, null, 2));
     let chart = $state();
     let chartContainer = $state();
     let datasetRows = writable([]);
-    let chartFullOptions = $derived({
-        ...JSON.parse(chartOptionsInput || '{}'), // Use the input string directly for reactivity
-        dataset: { source: $datasetRows },
-    });
+    let chartConfiguration = $state(dataItem?.chartConfiguration || {});
+    $inspect('debug chartConfiguration from tile:',chartConfiguration);
+    
 
     
     onMount(async () => {
         chart = echarts.init(chartContainer);
-        // Initial data fetch if a query exists
-        if (dataItem?.sqlQuery) {
-            const rows = await getDatasetFromQuery(dataItem.sqlQuery);
-            datasetRows.set(rows);
-        } else {
-            datasetRows.set([]); // Ensure an initial empty dataset if no query
+        if (chartConfiguration?.type) {
+            await refreshTile();
         }
+        
 
-        // Initial chart options if they exist
-        if (dataItem?.chartOptions) {
-            try {
-                chart.setOption({
-                    ...dataItem.chartOptions,
-                    dataset: { source: $datasetRows } // Apply initial options
-                });
-            } catch (error) {
-                console.error("Error setting initial chart options:", error);
-            }
-        }
-
-        // Cleanup
-        return () => {
-            chart.dispose();
-        };
+        return () => chart.dispose();
     });
 
     function resizeChart() {
@@ -65,39 +44,50 @@
                 });
                 return rowData;
             });
-            datasetRows.set(rows);
-            console.log("Updated datasetRows:", $datasetRows);
+            // datasetRows.set(rows);
+            // console.log("Updated datasetRows:", $datasetRows);
             return rows;
         } catch (error) {
             console.error("Error executing query:", error);
-            datasetRows.set([]); // Set to empty on error
+            // datasetRows.set([]); // Set to empty on error
             return [];
         }
     }
 
     async function saveTile() {
         try {
-            const parsedOptions = JSON.parse(chartOptionsInput || '{}');
-            const rows = await getDatasetFromQuery(sqlQueryInput);
-
-            // emit to parent
+            await refreshTile();
             onUpdate({
                 id: dataItem.id,
-                sqlQuery: sqlQueryInput,
-                chartOptions: parsedOptions,
-            });
-            
-            // update chart
-            datasetRows.set(rows);
-            chart.setOption({
-                ...dataItem.chartOptions,
-                dataset: { source: $datasetRows } // Apply initial options
+                chartConfiguration
             });
         } catch (e) {
-            console.error("Invalid JSON or query error", e);
+            console.error("Error saving tile:", e);
             datasetRows.set([]);
         }
     }
+
+    async function refreshTile() {
+        if (chartConfiguration.type === "advanced") {
+            const { sqlQuery, chartOptions } = chartConfiguration.configuration;
+            const rows = await getDatasetFromQuery(sqlQuery);
+            datasetRows.set(rows);
+            const fullChartOptions = { ...chartOptions, dataset: { source: $datasetRows } };
+            console.log("fullChartOptions (advanced):", fullChartOptions);
+            chart.setOption(fullChartOptions);
+        } else {
+            const sqlQuery = buildChartQuery(chartConfiguration.configuration);
+            const rows = await getDatasetFromQuery(sqlQuery);
+            datasetRows.set(rows);
+            const fullChartOptions = {
+                ...buildOptionsFromUI(chartConfiguration.configuration),
+                dataset: { source: $datasetRows }
+            };
+            console.log("fullChartOptions (ui):", fullChartOptions);
+            chart.setOption(fullChartOptions);
+        }
+    }
+
 
 </script>
 
@@ -105,8 +95,7 @@
     {#if editMode}
         <TileEditBar 
             remove={() => remove(dataItem)} 
-            bind:sqlQueryInput={sqlQueryInput} 
-            bind:chartOptionsInput={chartOptionsInput}
+            bind:chartConfiguration
             onSave={saveTile}
         />
     {/if}
