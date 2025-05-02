@@ -1,47 +1,5 @@
 #! /usr/bin/env node
 
-// import fs from 'fs';
-// import path from 'path';
-// import { fileURLToPath } from 'url';
-// import { parse } from 'yaml';
-
-// // Get __dirname in ES Modules
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
-
-// // Paths
-// const configDirName = 'odv_config';
-// const configDir = path.resolve(__dirname, configDirName);
-// const outputFile = path.resolve(__dirname, 'src/odv_configuration.json');
-
-// async function parseAndMergeYaml() {
-//   try {
-//     // Read all YAML files in the config directory
-//     const files = fs.readdirSync(configDir).filter(file => file.endsWith('.yaml') || file.endsWith('.yml'));
-
-//     // Parse and merge the YAML content
-//     const mergedConfig = files.reduce((acc, file) => {
-//       const filePath = path.join(configDir, file);
-//       const fileContent = fs.readFileSync(filePath, 'utf8');
-//       const parsedYaml = parse(fileContent);
-
-//       // Merge content into accumulator
-//       return { ...acc, ...parsedYaml };
-//     }, {});
-
-//     // Write the merged JSON to the output file
-//     fs.writeFileSync(outputFile, JSON.stringify(mergedConfig, null, 2));
-//     console.log(`Successfully merged YAML files and wrote output to: ${outputFile}`);
-//   } catch (error) {
-//     console.error('Error processing YAML files:', error);
-//     process.exit(1);
-//   }
-// }
-
-// // Execute the script
-// parseAndMergeYaml();
-
-
 // Import necessary packages
 import fs from 'fs-extra';
 import path from 'path';
@@ -52,7 +10,7 @@ const configFolderPath = path.join(process.cwd(), 'odv_config');
 const outputFilePath = path.join(process.cwd(), 'src/odv_configuration.json');
 
 // Define the high-level keys that should be merged as arrays
-const mergeableKeys = ['dashboards', 'datasets', 'data_sources', 'visualisations']; 
+const mergeableKeys = ['dashboards', 'data_sources', 'data_apps']; 
 
 // Function to read and parse YAML files
 async function readYAMLFiles(folderPath) {

@@ -10,11 +10,12 @@
 		"parse-config": "node parse_config.js"
 	},
 	"devDependencies": {
+		"@lucide/svelte": "^0.492.0",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0",
 		"autoprefixer": "^10.4.20",
-		"bits-ui": "^1.0.0-next.77",
+		"bits-ui": "^1.4.3",
 		"clsx": "^2.1.1",
 		"lucide-svelte": "^0.469.0",
 		"svelte": "^5.0.0",
@@ -23,14 +24,22 @@
 		"tailwind-variants": "^0.3.0",
 		"tailwindcss": "^3.4.9",
 		"tailwindcss-animate": "^1.0.7",
+		"vaul-svelte": "^1.0.0-next.7",
 		"vite": "^5.4.11"
 	},
 	"dependencies": {
+		"@codemirror/lang-json": "^6.0.1",
+		"@codemirror/lang-sql": "^6.8.0",
+		"@codemirror/lang-yaml": "^6.1.2",
 		"@duckdb/duckdb-wasm": "^1.29.0",
+		"@svelte-put/resize": "^4.0.0",
 		"echarts": "^5.6.0",
 		"echarts-simple-transform": "^1.0.0",
 		"fs-extra": "^11.2.0",
 		"mode-watcher": "^0.5.0",
+		"svelte-codemirror-editor": "^1.4.1",
+		"svelte-grid": "^5.1.2",
+		"svelte-jsoneditor": "^2.3.3",
 		"yaml": "^2.7.0"
 	}
 }

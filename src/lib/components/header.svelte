@@ -5,6 +5,7 @@
 	import Moon from "lucide-svelte/icons/moon";
 
 	import { toggleMode } from "mode-watcher";
+	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 </script>
 
 <header
@@ -13,15 +14,16 @@
 	<div class="container flex h-14 max-w-screen-2xl items-center justify-between">
 		<!-- Left-aligned elements -->
 		<div class="mr-4 hidden md:flex">
+			<Sidebar.Trigger />	
 			<a href="/" class="mr-6 flex items-center space-x-2">
 				<!-- <Icon.Logo class="size-6" /> -->
-				<span class="hidden font-bold xl:inline-block">
+				<span class=" font-bold xl:inline-block dark:text-white">
 					<!-- {siteConfig.name} -->
 					Open Data Viz
 				</span>
 			</a>
 			<nav class="flex items-center gap-6 text-sm">
-				<a
+				<!-- <a
 					href="/dashboards"
 					class="hover:text-foreground/80 transition-colors"
 				>
@@ -32,6 +34,12 @@
 					class="hover:text-foreground/80 transition-colors"
 				>
 					Data Sources
+				</a> -->
+				<a
+					href="/creation"
+					class="hover:text-foreground/80 transition-colors"
+				>
+					Creation
 				</a>
 			</nav>
 		</div>

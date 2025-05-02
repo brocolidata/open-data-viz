@@ -5,9 +5,10 @@
 	import SiteHeader from "$lib/components/header.svelte";
 	import { ModeWatcher } from "mode-watcher";
 	import { onMount } from 'svelte'
-	import { loadData } from "$lib/duckdb"
+	import { loadData } from "$lib/utils/duckdb"
 	import { DoubleBounce } from 'svelte-loading-spinners';
 	import * as Card from "$lib/components/ui/card/index.js";
+	import { initializeAppStores } from '$lib/utils/stores'
 
 	let { children } = $props();
 
@@ -15,6 +16,7 @@
 	
 	onMount(() => {
 		appIsReady = loadData();
+		initializeAppStores();
 	});
 </script>
 {#await appIsReady}
@@ -39,20 +41,24 @@
 		</Card.Root>
 	</div>
 {:then value}
-	<SiteHeader />
-
-	<ModeWatcher />
 	
-	<Sidebar.Provider>
+	<Sidebar.Provider open={false}>
+		<ModeWatcher />
+	
 		<AppSidebar />
+		<div>
+			<SiteHeader />
+
 		
-		<main>	
-			<!-- <div class="h-screen w-screen shadow-md" id="page" data-vaul-drawer-wrapper> -->
-			<div class="w-screen h-full shadow-md" id="page">
-				<Sidebar.Trigger />	
-				{@render children?.()}
-			</div>
-		</main>
+		
+			<main>	
+				<!-- <div class="h-screen w-screen shadow-md" id="page" data-vaul-drawer-wrapper> -->
+				<div class="w-screen h-screen shadow-md" id="page">
+					<!-- <Sidebar.Trigger />	 -->
+					{@render children?.()}
+				</div>
+			</main>
+		</div>
 	</Sidebar.Provider>
 
 	{:catch error}
