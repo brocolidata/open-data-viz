@@ -1,4 +1,4 @@
-import config from '../../odv_configuration.json';
+import config from '$odv-config';
 import { dataAppsIndex } from './stores';
 
 export function getConfig() {

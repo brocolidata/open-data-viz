@@ -31,6 +31,9 @@ export default {
 			paths: {
 				base: process.argv.includes('dev') ? '' : process.env.BASE_PATH
 			}
-		})
+		}),
+		alias: {
+			'$odv-config': '/src/odv_configuration.json'
+		}
 	}
 };
