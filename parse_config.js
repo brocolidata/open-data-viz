@@ -5,8 +5,15 @@ import fs from 'fs-extra';
 import path from 'path';
 import * as yaml from 'yaml';
 
+// Define the environment variable name for the config folder
+const CONFIG_FOLDER_ENV_VAR = 'ODV_CONFIG_FOLDER';
+
 // Define the folder containing the YAML files and output location
-const configFolderPath = path.join(process.cwd(), 'odv_config');
+// const configFolderPath = path.join(process.cwd(), 'odv_config');
+// Determine the configuration folder path
+const configFolderPath = process.env[CONFIG_FOLDER_ENV_VAR]
+  ? path.resolve(process.cwd(), process.env[CONFIG_FOLDER_ENV_VAR])
+  : path.join(process.cwd(), 'odv_config');
 const outputFilePath = path.join(process.cwd(), 'src/odv_configuration.json');
 
 // Define the high-level keys that should be merged as arrays

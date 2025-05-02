@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy Open-Data-Viz to GitHub Pages
 
 on:
   push:
@@ -29,6 +29,7 @@ jobs:
       - name: build
         env:
           BASE_PATH: '/${{ github.event.repository.name }}'
+          ODV_CONFIG_FOLDER: '${{ github.workspace }}/odv_config'
         run: |
           npm run parse-config
           npm run build
@@ -38,23 +39,6 @@ jobs:
         with:
           path: 'build/'
 
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-  deploy:
-    needs: build_site
-    runs-on: ubuntu-latest
-
-    permissions:
-      pages: write
-      id-token: write
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
