@@ -7,7 +7,10 @@
     import YAMLEditor from "$lib/components/code_editor/yaml.svelte";
     import { toggleEditInTiles } from "$lib/utils/grid_utils";
 
-    let { dashboardExport } = $props();
+    let { 
+        dashboardExport, 
+        isOpen=$bindable() 
+    } = $props();
     let dashboardStateString = $derived(convertJsonToYaml(dashboardExport));
     
     async function copyToClipboard() {
@@ -32,16 +35,16 @@
 
 </script>
 
-<Sheet.Root>
-    <Sheet.Trigger class={buttonVariants({ variant: "secondary" })}>
+<Sheet.Root bind:open={isOpen}>
+    <!-- <Sheet.Trigger class={buttonVariants({ variant: "secondary" })}>
         <FileSymlink />
         Export
-    </Sheet.Trigger>
+    </Sheet.Trigger> -->
 <Sheet.Content >
     <Sheet.Header>
-        <Sheet.Title>Dashboard configuration JSON</Sheet.Title>
+        <Sheet.Title>Configuration YAML</Sheet.Title>
         <Sheet.Description>
-            You can copy/paste this to a Open Data Viz JSON file
+            You can copy/paste this to a Open Data Viz YAML file
         </Sheet.Description>
     </Sheet.Header>
     <div class="px-2 py-6 overflow-auto h-96">

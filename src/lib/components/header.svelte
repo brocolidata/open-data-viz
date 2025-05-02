@@ -36,7 +36,7 @@
 					Data Sources
 				</a> -->
 				<a
-					href="/dashboard/new"
+					href="/creation"
 					class="hover:text-foreground/80 transition-colors"
 				>
 					Creation

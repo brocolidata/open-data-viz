@@ -61,36 +61,57 @@ export function updateTile(items: any[], updated: any): any[] {
   );
 }
 
-export interface GridItem {
+
+type Layout = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  fixed?: boolean;
+  resizable?: boolean;
+  draggable?: boolean;
+  customDragger?: boolean;
+  customResizer?: boolean;
+};
+
+export type GridItem = {
   id: string;
-  [key: number]: {
-      x: number;
-      y: number;
-      w: number;
-      h: number;
-      fixed?: boolean;
-      resizable?: boolean;
-      draggable?: boolean;
-  };
-  sqlQuery?: string;
-  chartOptions?: object;
-}
+  [key: number]: Layout;
+  chartConfiguration: object
+  // other props (like id, name, etc.) can go here if needed
+};
 
 export function toggleEditInTiles(
   items: GridItem[],
   cols: number,
   editMode: boolean
 ): GridItem[] {
-  return items.map((item) => ({
+  const editProps = {
+    fixed: false,
+    resizable: true,
+    draggable: true,
+    // customDragger: true,
+    // customResizer: true,
+  };
+
+  const editOnlyKeys = Object.keys(editProps);
+
+  return items.map((item) => {
+    const base = item[cols] ?? { x: 0, y: 0, w: 1, h: 1 };
+
+    const cleanedBase = Object.fromEntries(
+      Object.entries(base).filter(([key]) => !editOnlyKeys.includes(key))
+    ) as Layout;
+
+    return {
       ...item,
-      [cols]: {
-          ...item[cols],
-          fixed: !editMode,
-          resizable: editMode,
-          draggable: editMode,
-      },
-  }));
+      [cols]: editMode
+        ? { ...base, ...editProps }
+        : { ...cleanedBase, fixed: true },
+    };
+  });
 }
+
 
 
 export interface DashboardState {
@@ -109,18 +130,21 @@ export function getExportableDashboardState(
   state: DashboardState,
   cols: number
 ): DashboardState {
-  const tiles = state.tiles.map((item) => ({
+  const editOnlyKeys = ['fixed', 'resizable', 'draggable', 'customDragger', 'customResizer'];
+
+  const tiles = state.tiles.map((item) => {
+    const layout = Object.fromEntries(
+      Object.entries(item[cols]).filter(([key]) => !editOnlyKeys.includes(key))
+    );
+
+    return {
       ...item,
-      [cols]: {
-          ...item[cols],
-          fixed: true,
-          resizable: false,
-          draggable: false,
-      },
-  }));
+      [cols]: layout,
+    };
+  });
 
   return {
-      ...state,
-      tiles,
+    ...state,
+    tiles,
   };
 }

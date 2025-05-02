@@ -93,15 +93,15 @@
         } else {
             const sqlQuery = buildChartQuery(chartConfiguration.configuration);
             const rows = await getDatasetFromQuery(sqlQuery);
+            const UIChartOptions = buildOptionsFromUI(chartConfiguration.configuration)
             datasetRows.set(rows);
             const fullChartOptions = {
-                ...buildOptionsFromUI(chartConfiguration.configuration),
+                ...UIChartOptions,
                 dataset: { source: $datasetRows }
             };
             chart.setOption(fullChartOptions);
         }
     }
-
 
 </script>
 

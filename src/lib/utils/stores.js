@@ -1,8 +1,9 @@
 import { get, writable } from 'svelte/store';
-import { getDashboards } from '$lib/utils/odv_config.js'
+import { getDashboards, getDataApps } from '$lib/utils/odv_config.js'
 
-// Initial state for dashboardsIndex
+// Initial index state for dashboards, data sources
 export const dashboardsIndex = writable([]);
+export const dataAppsIndex = writable([]);
 
 /**
  * Adds a new dashboard object to the dashboardsIndex store.
@@ -21,6 +22,22 @@ export function initializeDashboards() {
   }
 }
 
+export function initializeDataApps() {
+  const initialStaticDataApps = getDataApps();
+  if (initialStaticDataApps && Array.isArray(initialStaticDataApps)) {
+    dataAppsIndex.update((currentDataApps) => {
+      return [...currentDataApps, ...initialStaticDataApps];
+    });
+  } else {
+    console.warn("initializeDataApps called with non-array or empty initialStaticDataApps.");
+  }
+}
+
+export function initializeAppStores() {
+  initializeDashboards();
+  initializeDataApps();
+}
+
 export function createDashboard(dashboard) {
   dashboardsIndex.update((currentDashboards) => {
       // Check if the dashboard already exists (e.g., by name) to avoid duplicates
@@ -30,6 +47,19 @@ export function createDashboard(dashboard) {
       }
       // Add the new dashboard to the list
       return [...currentDashboards, dashboard];
+  });
+}
+
+export function createDataApp(dataApp) {
+  dataAppsIndex.update((currentDataApps) => {
+      // Check if the data app already exists (e.g., by name) to avoid duplicates
+      if (currentDataApps.some(da => da.name === dataApp.name)) {
+          console.warn(`Data app with name "${dataApp.name}" already exists.`);
+          return currentDataApps;
+      }
+      // Add the new data app to the list
+      console.log(`Successfully added ${dataApp.name} to dataAppsIndex`)
+      return [...currentDataApps, dataApp];
   });
 }
 
@@ -76,4 +106,106 @@ export function updateDashboard(name, updates) {
 export function getDashboardByName(name) {
   const dashboards = get(dashboardsIndex); // Get the current state of the store
   return dashboards.find((dashboard) => dashboard.name === name) || {};
+}
+
+/**
+ * Function to get a data app object by name.
+ * @param {string} name - The name of the dashboard to fetch.
+ * @returns {object} - The dashboard object if found, or an empty object if not found.
+ */
+export function getDataAppByName(name) {
+  const dataApps = get(dataAppsIndex); // Get the current state of the store
+  return dataApps.find((dataApp) => dataApp.name === name) || {};
+}
+
+export function getDashboardsForDataApp(dashboardNames) {
+  if (dashboardNames) {
+    const allDashboards = get(dashboardsIndex);
+
+    return dashboardNames.flatMap((name) =>
+      allDashboards.filter((dashboard) => dashboard.name === name)
+    );
+  } else {
+    console.log('No dashboard found for active data app');
+    return [];
+  }
+}
+
+export function addDashboardToDataApp(dataAppName, dashboardName) {
+  dataAppsIndex.update((currentDataApps) => {
+    const index = currentDataApps.findIndex(
+      (dataApp) => dataApp.name === dataAppName
+    );
+
+    if (dataAppIndex !== -1) {
+      const updatedDataApps = currentDataApps.map((dataApp, index) => {
+        if (index === dataAppIndex) {
+          // Check if the dashboard already exists
+          if (dataApp.dashboards.some((dashboard) => dashboard === dashboardName)) {
+            console.warn(
+              `Dashboard with name "${dashboardName}" already exists in DataApp "${dataAppName}".`
+            );
+            return dataApp; // Return the original dataApp without changes
+          }
+          return {
+            ...dataApp,
+            dashboards: [...dataApp.dashboards, dashboardName],
+          };
+        }
+        return dataApp;
+      });
+      console.log(
+        `Dashboard "${dashboardName}" added to DataApp "${dataAppName}".`
+      );
+      return updatedDataApps;
+    } else {
+      console.warn(`DataApp with name "${dataAppName}" does not exist.`);
+      return currentDataApps; // No changes if the DataApp doesn't exist
+    }
+  });
+}
+
+export function updateDashboardsInDataApp(dataAppName, dashboardNames) {
+  dataAppsIndex.update((currentDataApps) => {
+    const dataAppIndex = currentDataApps.findIndex(
+      (dataApp) => dataApp.name === dataAppName
+    );
+
+    if (dataAppIndex === -1) {
+      console.warn(`DataApp with name "${dataAppName}" does not exist.`);
+      return currentDataApps;
+    }
+
+    const updatedDataApps = currentDataApps.map((dataApp, index) => {
+      if (index !== dataAppIndex) return dataApp;
+
+      const existingDashboards = new Set(dataApp.dashboards);
+      const dashboardsToAdd = [];
+
+      dashboardNames.forEach((name) => {
+        const trimmedName = name.trim();
+        if (!existingDashboards.has(trimmedName)) {
+          dashboardsToAdd.push(trimmedName);
+          existingDashboards.add(trimmedName);
+        } else {
+          console.warn(
+            `Dashboard "${trimmedName}" already exists in DataApp "${dataAppName}".`
+          );
+        }
+      });
+
+      if (dashboardsToAdd.length === 0) return dataApp;
+
+      console.log(
+        `Dashboards "${dashboardsToAdd.join('", "')}" added to DataApp "${dataAppName}".`
+      );
+
+      return {
+        ...dataApp,
+        dashboards: [...dataApp.dashboards, ...dashboardsToAdd],
+      };
+    });
+
+    return updatedDataApps;
+  });
 }

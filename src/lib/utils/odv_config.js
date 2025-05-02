@@ -1,4 +1,5 @@
 import config from '../../odv_configuration.json';
+import { dataAppsIndex } from './stores';
 
 export function getConfig() {
   return config;
@@ -46,3 +47,12 @@ export function getVisualisations() {
 export function getVisualisationByName(visualisation_name) {
   return config.visualisations.find(visualisation => visualisation.name === visualisation_name)
 }
+
+export function getDataApps() {
+  const dataApps = config.data_apps.map(data_app => ({
+    ...data_app,
+    definition_source: 'configuration file'
+  }));
+  return dataApps;
+}
+

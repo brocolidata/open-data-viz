@@ -8,7 +8,7 @@
 	import { loadData } from "$lib/utils/duckdb"
 	import { DoubleBounce } from 'svelte-loading-spinners';
 	import * as Card from "$lib/components/ui/card/index.js";
-	import { initializeDashboards } from '$lib/utils/stores'
+	import { initializeAppStores } from '$lib/utils/stores'
 
 	let { children } = $props();
 
@@ -16,7 +16,7 @@
 	
 	onMount(() => {
 		appIsReady = loadData();
-		initializeDashboards();
+		initializeAppStores();
 	});
 </script>
 {#await appIsReady}

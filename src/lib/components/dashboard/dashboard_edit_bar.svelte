@@ -1,7 +1,13 @@
 <script>
     import { onMount } from 'svelte'
     import * as Popover from "$lib/components/ui/popover/index.js";
-    import { SquarePlus, Save, SlidersHorizontal, Check} from 'lucide-svelte';
+    import { 
+        Check, 
+        FileSymlink, 
+        Save, 
+        SlidersHorizontal, 
+        SquarePlus 
+    } from 'lucide-svelte';
     import { Button } from "$lib/components/ui/button/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
     import { Label } from "$lib/components/ui/label/index.js";
@@ -27,6 +33,7 @@
     let disableSave = $state(false);
     let dashboardExport = $derived(getExportableDashboardState(dashboardState, COLS));
     let saveSuccess = $state(false);
+    let openExportConfigDrawer = $state(false);
 
     onMount(() => {
 		if (dashboardDefinitionSource === "configuration file") {
@@ -55,13 +62,6 @@
         onEditModeToggle();
     }
 
-    function process_dashboard_state(dashboard_state) {
-        if (editMode) {
-
-        } else {
-
-        }
-    }
 </script>
 
 <div class="dashboard-bar bg-gray-200 dark:bg-gray-700 py-2 px-4 flex space-x-4">
@@ -112,7 +112,15 @@
             Save Dashboard
         {/if}
     </Button>
-    <ExportConfigDrawer {dashboardExport}/>
+    <Button 
+        variant="secondary" 
+        onclick={() => ( openExportConfigDrawer = true)} 
+        class="flex items-center"
+    >
+        <FileSymlink class="mr-2 size-4"/>
+        Export
+    </Button>
+    <ExportConfigDrawer {dashboardExport} bind:isOpen={openExportConfigDrawer}/>
     <div class="flex items-center space-x-2">
         <span class="text-sm text-gray-700 dark:text-gray-300">View</span>
         <Switch 

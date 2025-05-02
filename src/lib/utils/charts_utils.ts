@@ -44,15 +44,17 @@ export function inferSeries({
     columns
 }) {
     // Case 1: Main dimension and main metric (optional secondary metrics)
-    if (mainDimension && mainMetric?.column) {
+    if (mainDimension && mainMetric?.column && !secondaryDimension  && secondaryMetrics.length === 0) {
+        console.log('inferSeries Case 1');
         return [{
             column: `${mainMetric.aggregation}_${mainMetric.column}`,
-            type: "line", // or another chart type depending on preference
+            type: "bar", // or another chart type depending on preference
         }];
     }
 
     // Case 2: Main dimension, secondary dimension, and main metric (pivoted by secondary dimension)
     if (mainDimension && secondaryDimension && mainMetric?.column) {
+        console.log('inferSeries Case 2');
         return columns
             .filter((col) => col !== mainDimension && col !== secondaryDimension)
             .map((col) => ({
@@ -63,6 +65,7 @@ export function inferSeries({
 
     // Case 3: Main dimension, main metric, and secondary metrics (one series per secondary metric)
     if (mainDimension && mainMetric?.column && secondaryMetrics.length > 0) {
+        console.log('inferSeries Case 3');
         return [mainMetric, ...secondaryMetrics]
             .filter((m) => m?.column)
             .map((m) => ({
@@ -102,11 +105,11 @@ export function buildChartQuery({
 
 	// CASE 1: Pivot table
 	if (hasMainDim && hasSecondaryDim) {
-		return `
-            PIVOT ${mainDimension}
+        return `
+            PIVOT ${dataset} 
             ON ${secondaryDimension}
             USING ${mainAgg}(${mainMetric.column})
-            FROM ${dataset}
+            GROUP BY ${mainDimension} 
 		`.trim();
 	}
 
@@ -190,19 +193,19 @@ export function buildOptionsFromUI({
             top: 'bottom'
         },
         xAxis: {
-            type: 'category',
+            type: dimensionOnXAxis ? 'value' : 'category',
             name: xAxisField
         },
         yAxis: {
-            type: 'value',
+            type: dimensionOnXAxis ? 'category' : 'value',
             name: yAxisField
         },
         series: seriesList.map((series) => ({
             type: series.type || 'bar',
             name: series.column,
             encode: {
-                x: dimensionOnXAxis ? mainDimension : series.column,
-                y: dimensionOnXAxis ? series.column : mainDimension,
+                x: dimensionOnXAxis ? series.column : mainDimension,
+                y: dimensionOnXAxis ? mainDimension : series.column,
             }
         }))
     };

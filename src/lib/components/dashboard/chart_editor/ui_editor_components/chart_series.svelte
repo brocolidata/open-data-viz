@@ -2,6 +2,7 @@
 	import { onMount } from "svelte";
 	import ChartSeriesItem from "./chart_series_item.svelte";
 	import Button from "$lib/components/ui/button/button.svelte";
+	import Label from "$lib/components/ui/label/label.svelte";
 	import Switch from "$lib/components/ui/switch/switch.svelte";
 	import Combobox from "$lib/components/custom_ui/combobox.svelte";
 	import { inferSeries, getDataColumnsOptions } from "$lib/utils/charts_utils";
@@ -56,11 +57,10 @@
 		</h2>
 	</div>
 
-	{#if mainDimension && (secondaryDimension || secondaryMetrics.length > 0)}
-		<Switch bind:checked={dimensionOnXAxis}>
-			{dimensionOnXAxis ? "Dimension on X Axis" : "Dimension on Y Axis"}
-		</Switch>
-	{/if}
+	<Label>Dimension on</Label>
+	<Label>X axis</Label>
+	<Switch bind:checked={dimensionOnXAxis}/>
+	<Label>Y axis</Label>
 
 	{#each seriesList as series, i (i)}
 		<ChartSeriesItem
