@@ -35,7 +35,7 @@
                                 active={sectionIsActive("dashboards", dashboard.name)}
                             >
                                 {#snippet child({ props })}
-                                    <a href="{base}/dashboards/{dashboard.name}" {...props}>
+                                    <a href="{base}/dashboard/{dashboard.name}" {...props}>
                                         <span>{dashboard.label}</span>
                                     </a>
                                 {/snippet}
@@ -57,7 +57,7 @@
                                 active={sectionIsActive("dashboards", source.name)}
                             >
                                 {#snippet child({ props })}
-                                    <a href="{base}/data_sources/{source.name}" {...props}>
+                                    <a href="{base}/data_source/{source.name}" {...props}>
                                         <span>{source.label}</span>
                                     </a>
                                 {/snippet}
