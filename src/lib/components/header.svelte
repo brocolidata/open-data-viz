@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from "$app/state";
+	import { base } from '$app/paths';
 	import { Button } from "$lib/components/ui/button/index.js";
     import Sun from "lucide-svelte/icons/sun";
 	import Moon from "lucide-svelte/icons/moon";
@@ -15,7 +15,7 @@
 		<!-- Left-aligned elements -->
 		<div class="mr-4 hidden md:flex">
 			<Sidebar.Trigger />	
-			<a href="/" class="mr-6 flex items-center space-x-2">
+			<a href="{base}/" class="mr-6 flex items-center space-x-2">
 				<!-- <Icon.Logo class="size-6" /> -->
 				<span class=" font-bold xl:inline-block dark:text-white">
 					<!-- {siteConfig.name} -->
@@ -24,19 +24,19 @@
 			</a>
 			<nav class="flex items-center gap-6 text-sm">
 				<!-- <a
-					href="/dashboards"
+					href="{base}/dashboards"
 					class="hover:text-foreground/80 transition-colors"
 				>
 					Dashboards
 				</a>
 				<a
-					href="/data_sources"
+					href="{base}/data_sources"
 					class="hover:text-foreground/80 transition-colors"
 				>
 					Data Sources
 				</a> -->
 				<a
-					href="/creation"
+					href="{base}/creation"
 					class="hover:text-foreground/80 transition-colors"
 				>
 					Creation

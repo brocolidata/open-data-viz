@@ -1,6 +1,7 @@
 <script>
     import { onMount } from "svelte";
 	import { page } from "$app/stores";
+	import { base } from '$app/paths';
 	import Button from "$lib/components/ui/button/button.svelte";
 	import * as Card from "$lib/components/ui/card/index.js";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
@@ -61,7 +62,7 @@
 					<DropdownMenu.Item>
 						<!-- <span>Edit</span> -->
 						<Plus class="mr-2 size-4"/>
-						<a href="/data_app/{dataAppName}/dashboard/new" class="w-full block">Create dashboard</a>
+						<a href="{base}/data_app/{dataAppName}/dashboard/new" class="w-full block">Create dashboard</a>
 					</DropdownMenu.Item>
 					<DropdownMenu.Item 
 						onSelect={() => ( openExportConfigDrawer = true )}
@@ -111,7 +112,7 @@
 	  <h2 class="text-2xl font-bold mb-4">Dashboards</h2>
 	  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 		{#each dashboards as dashboard}
-			<a href="/data_app/{dataAppName}/dashboard/{dashboard.name}" class="card">
+			<a href="{base}/data_app/{dataAppName}/dashboard/{dashboard.name}" class="card">
 				<Card.Root >
 					<Card.Header>
 					<Card.Title>{dashboard.label}</Card.Title>

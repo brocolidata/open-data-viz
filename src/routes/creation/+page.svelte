@@ -1,5 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import * as Card from "$lib/components/ui/card/index.js";
 	import * as Dialog from "$lib/components/ui/dialog/index.js";
 	import Label from "$lib/components/ui/label/label.svelte";
@@ -24,7 +25,7 @@
 				definition_source: "in memory"
 			}
 		);
-		goto(`/data_app/${dataAppName}`);
+		goto(`${base}/data_app/${dataAppName}`);
 	}
 </script>
 
@@ -69,7 +70,7 @@
 				  </Dialog.Footer>
 				</Dialog.Content>
 			  </Dialog.Root>
-            <a href="/dashboard/new" class="card">
+            <a href="{base}/dashboard/new" class="card">
 				<Card.Root >
 					<Card.Header>
 					<Card.Title>New Dashboard</Card.Title>
