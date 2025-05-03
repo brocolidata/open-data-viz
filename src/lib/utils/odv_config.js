@@ -1,5 +1,22 @@
-import config from '$odv-config';
+import { base } from '$app/paths';
 import { dataAppsIndex } from './stores';
+
+let config = null;
+
+export async function loadConfig() {
+  if (config) return; // prevent double-fetch
+  try {
+    const JSONURL = `${base}/config/odv_configuration.json`;
+    console.log('Fetching from ', JSONURL);
+    const response = await fetch(JSONURL);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    config = await response.json();
+    console.log('Successfully fetched JSON configuration');
+  } catch (error) {
+    console.error("Could not fetch configuration:", error);
+    config = {}; // fall back to empty object
+  }
+}
 
 export function getConfig() {
   return config;
