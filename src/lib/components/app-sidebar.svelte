@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { base } from '$app/paths';
     import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 
     import { getDashboards, getDataSources } from "$lib/utils/odv_config";
@@ -34,7 +35,7 @@
                                 active={sectionIsActive("dashboards", dashboard.name)}
                             >
                                 {#snippet child({ props })}
-                                    <a href="/dashboards/{dashboard.name}" {...props}>
+                                    <a href="{base}/dashboards/{dashboard.name}" {...props}>
                                         <span>{dashboard.label}</span>
                                     </a>
                                 {/snippet}
@@ -56,7 +57,7 @@
                                 active={sectionIsActive("dashboards", source.name)}
                             >
                                 {#snippet child({ props })}
-                                    <a href="/data_sources/{source.name}" {...props}>
+                                    <a href="{base}/data_sources/{source.name}" {...props}>
                                         <span>{source.label}</span>
                                     </a>
                                 {/snippet}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import * as Card from "$lib/components/ui/card/index.js";
 	import { getDataApps, getDataSources } from "$lib/utils/odv_config";
 	import {dashboardsIndex, dataAppsIndex} from "$lib/utils/stores";
@@ -14,7 +15,7 @@
 	  <h2 class="text-2xl font-bold mb-4">Data apps</h2>
 	  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 		{#each $dataAppsIndex as dataApp}
-			<a href="/data_app/{dataApp.name}" class="card">
+			<a href="{base}/data_app/{dataApp.name}" class="card">
 				<Card.Root >
 					<Card.Header>
 					<Card.Title>{dataApp.label}</Card.Title>
@@ -41,7 +42,7 @@
 			<h3 class="text-lg font-semibold">{source.label}</h3>
 			<p class="text-gray-600">{source.path}</p>
 		  </div> -->
-		  <a href="/data_source/{source.name}" class="card">
+		  <a href="{base}/data_source/{source.name}" class="card">
 			<Card.Root >
 				<Card.Header>
 				<Card.Title>{source.label}</Card.Title>
