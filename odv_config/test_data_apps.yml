@@ -1,0 +1,7 @@
+data_apps:
+- name: Test_data_app
+  label: Test data app
+  description: A data app for test purposes
+  dashboards:
+  - UI_dashboard
+    

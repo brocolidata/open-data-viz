@@ -1,0 +1,4 @@
+data_sources:
+  - name: "sales_orders"
+    label: "Sales Order"
+    path: "data/SalesOrder.parquet"
