@@ -11,9 +11,10 @@ export default {
 			fallback: 'index.html',
 			precompress: false,
 			strict: true,
-			paths: {
-				base
-			}
-		})
+			
+		}),
+		paths: {
+			base
+		}
 	}
 };
