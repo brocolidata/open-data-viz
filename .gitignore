@@ -1,7 +1,7 @@
 node_modules
 
 #ODV
-src/odv_configuration.json
+static/config/odv_configuration.json
 odv_config/
 
 # Output

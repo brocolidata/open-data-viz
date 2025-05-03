@@ -14,7 +14,7 @@ const CONFIG_FOLDER_ENV_VAR = 'ODV_CONFIG_FOLDER';
 const configFolderPath = process.env[CONFIG_FOLDER_ENV_VAR]
   ? path.resolve(process.cwd(), process.env[CONFIG_FOLDER_ENV_VAR])
   : path.join(process.cwd(), 'odv_config');
-const outputFilePath = path.join(process.cwd(), 'src/odv_configuration.json');
+const outputFilePath = path.join(process.cwd(), 'static/config/odv_configuration.json');
 
 // Define the high-level keys that should be merged as arrays
 const mergeableKeys = ['dashboards', 'data_sources', 'data_apps']; 
