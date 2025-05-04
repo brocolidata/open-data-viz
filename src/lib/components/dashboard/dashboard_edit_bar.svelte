@@ -1,13 +1,11 @@
 <script>
     import { onMount } from 'svelte'
     import * as Popover from "$lib/components/ui/popover/index.js";
-    import { 
-        Check, 
-        FileSymlink, 
-        Save, 
-        SlidersHorizontal, 
-        SquarePlus 
-    } from 'lucide-svelte';
+    import Check from '@lucide/svelte/icons/check';
+    import FileSymlink from '@lucide/svelte/icons/file-symlink';
+    import Save from '@lucide/svelte/icons/save';
+    import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
+    import SquarePlus from '@lucide/svelte/icons/square-plus';
     import { Button } from "$lib/components/ui/button/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
     import { Label } from "$lib/components/ui/label/index.js";

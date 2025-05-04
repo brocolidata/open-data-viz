@@ -10,7 +10,9 @@
     import ChartSeries from "./ui_editor_components/chart_series.svelte";
     import ChartProperties from "./ui_editor_components/chart_properties.svelte";
     import * as Alert from "$lib/components/ui/alert/index.js";
-    import { CircleAlert, Check, Save } from "lucide-svelte";
+    import CircleAlert from '@lucide/svelte/icons/circle-alert';
+    import Check from '@lucide/svelte/icons/check';
+    import Save from '@lucide/svelte/icons/save';
     import {
         fetchColumnOptions,
         getDataSourceOptions,

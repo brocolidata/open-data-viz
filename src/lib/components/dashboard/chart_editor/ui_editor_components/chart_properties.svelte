@@ -3,7 +3,7 @@
     import { Label } from "$lib/components/ui/label/index.js";
     import * as Popover from "$lib/components/ui/popover/index.js";
     import { buttonVariants } from "$lib/components/ui/button/index.js";
-    import { SlidersHorizontal } from 'lucide-svelte';
+    import SlidersHorizontal from "@lucide/svelte/icons/sliders-horizontal";
 
     let {
         chartProperties = $bindable(),
