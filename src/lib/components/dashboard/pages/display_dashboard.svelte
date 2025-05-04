@@ -7,7 +7,9 @@
     import Tile from "$lib/components/dashboard/tile.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import { buttonVariants } from "$lib/components/ui/button/index.js";
-    import { Ellipsis, Pencil, Plus } from 'lucide-svelte';
+    import Ellipsis from '@lucide/svelte/icons/ellipsis';
+    import Pencil from '@lucide/svelte/icons/pencil';
+    import Plus from '@lucide/svelte/icons/plus'
     import {
         toggleEditInTiles
     } from "$lib/utils/grid_utils.ts";

@@ -4,7 +4,8 @@
     import { buttonVariants } from "$lib/components/ui/button/index.js";
     import Combobox from "$lib/components/custom_ui/combobox.svelte";
     import * as Collapsible from "$lib/components/ui/collapsible/index.js";
-    import { ChevronDown, ChevronUp } from 'lucide-svelte';
+    import ChevronDown from "@lucide/svelte/icons/chevron-down";
+    import ChevronUp from "@lucide/svelte/icons/chevron-up";
 
     let {
         columnOptions,

@@ -6,7 +6,9 @@
 	import * as Card from "$lib/components/ui/card/index.js";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 	import { buttonVariants } from "$lib/components/ui/button/index.js";
-	import { Ellipsis, Plus, FileSymlink } from 'lucide-svelte';
+	import Ellipsis from "@lucide/svelte/icons/ellipsis";
+	import Plus from "@lucide/svelte/icons/plus";
+	import FileSymlink from "@lucide/svelte/icons/file-symlink";
     import { getDataAppByName, getDashboardsForDataApp } from "$lib/utils/stores";
 	import ExportConfigDrawer from '$lib/components/data/export_config_drawer.svelte';
     import { getExportableDashboardState } from "$lib/utils/grid_utils";

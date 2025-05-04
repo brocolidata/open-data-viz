@@ -1,5 +1,6 @@
 <script>
-    import { FileSymlink, Copy } from "lucide-svelte";
+    import FileSymlink from '@lucide/svelte/icons/file-symlink';
+    import Copy from '@lucide/svelte/icons/copy';
     import { Button } from "$lib/components/ui/button/index.js";
     import { buttonVariants } from "$lib/components/ui/button/index.js";
     import * as Sheet from "$lib/components/ui/sheet/index.js";
