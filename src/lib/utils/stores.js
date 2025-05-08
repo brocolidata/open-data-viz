@@ -209,3 +209,8 @@ export function updateDashboardsInDataApp(dataAppName, dashboardNames) {
     return updatedDataApps;
   });
 }
+
+
+export function createFiltersStore() {
+  return writable([]);
+}

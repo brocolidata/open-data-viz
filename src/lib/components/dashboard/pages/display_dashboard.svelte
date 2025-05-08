@@ -13,6 +13,16 @@
     import {
         toggleEditInTiles
     } from "$lib/utils/grid_utils.ts";
+    import DashboardFilterBar from "$lib/components/dashboard/dashboard_filter_bar.svelte";
+    import { setContext } from 'svelte';
+    import { createFiltersStore } from "$lib/utils/stores";
+    
+    // Create one filters store for this dashboard
+	// const filtersStore = createFiltersStore();
+    let filtersStore = createFiltersStore();
+
+    // Provide it to all children (tiles, filter bar, etc.)
+    setContext('filters', filtersStore);
 
     let {
         dashboardName,
@@ -23,27 +33,39 @@
     const COLS = 6;
     const cols = [[1200, COLS]];
     const editMode = false;
+    let tiles = $state({});
     
     let dashboard = $derived(getDashboardByName(dashboardName));
     let items = $derived.by(() => {
         if (dashboard?.tiles) {
             return dashboard.tiles.map((tile) => ({
                 ...tile,
+                // ref: null, // add this line
                 [COLS]: gridHelp.item(tile[COLS] || { x: 0, y: 0, w: 2, h: 2 }),
             }));
         } else {
             return [];
         }
-    })
+    });
     onMount(() => {
         toggleEdit(); // ensure attributes are set based on editMode
     });
     function toggleEdit() {
         items = toggleEditInTiles(items, COLS, editMode);
     }
+
+    function bindTileRef(item) {
+        return el => item.ref = el;
+    }
+
+    function removeFilterFromTile(filterToRemove) {
+        const tile = tiles[filterToRemove.tileID]
+        tile?.unselect?.(filterToRemove);
+    }
 </script>
 
 
+<DashboardFilterBar onRemoveFilter={(filterToRemove) => (removeFilterFromTile(filterToRemove))}/>
 <div class="flex items-center mb-4">
     <h2 class="text-3xl font-bold tracking-tight">{dashboardName}</h2>
     <!-- <div class="flex items-center space-x-2"> -->
@@ -68,7 +90,8 @@
 
 <div class="w-full">
     <Grid bind:items rowHeight={100} let:item let:dataItem {cols}>
-        <Tile 
+        <Tile
+            bind:this={tiles[dataItem.id]}
             dataItem={dataItem} 
             {editMode}
         />
