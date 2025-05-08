@@ -90,56 +90,67 @@ type QueryParams = {
     secondaryMetrics?: Metric[];
 };
 
-export function buildChartQuery({
-	dataset,
-	mainDimension,
-	secondaryDimension,
-	mainMetric,
-	secondaryMetrics = []
-}: QueryParams): string {
-	if (!dataset || !mainMetric?.column) return "-- Invalid configuration";
+export function buildChartQuery(
+    {
+        dataset,
+        mainDimension,
+        secondaryDimension,
+        mainMetric,
+        secondaryMetrics = []
+    }: QueryParams,
+    filters: { column: string; value: any }[] = [] // Optional filters parameter
+): string {
+    if (!dataset || !mainMetric?.column) return "-- Invalid configuration";
 
-	const hasMainDim = !!mainDimension;
-	const hasSecondaryDim = !!secondaryDimension;
-	const mainAgg = mainMetric.aggregation.toLowerCase();
+    const hasMainDim = !!mainDimension;
+    const hasSecondaryDim = !!secondaryDimension;
+    const mainAgg = mainMetric.aggregation.toLowerCase();
 
-	// CASE 1: Pivot table
-	if (hasMainDim && hasSecondaryDim) {
+    let whereClause = "";
+    if (filters && filters.length > 0) {
+        const conditions = filters.map(
+            (f) => `${f.column} = '${f.value}'`
+        );
+        whereClause = `WHERE ${conditions.join(" AND ")}`;
+    }
+
+    // CASE 1: Pivot table
+    if (hasMainDim && hasSecondaryDim) {
         return `
-            PIVOT ${dataset} 
+            PIVOT ${dataset}
             ON ${secondaryDimension}
             USING ${mainAgg}(${mainMetric.column})
-            GROUP BY ${mainDimension} 
-		`.trim();
-	}
+            GROUP BY ${mainDimension}
+        `.trim();
+    }
 
-	// CASE 2: Grouped aggregation by main dimension
-	if (hasMainDim && !hasSecondaryDim) {
-		const metrics = [mainMetric, ...secondaryMetrics].filter(
+    // CASE 2: Grouped aggregation by main dimension
+    if (hasMainDim && !hasSecondaryDim) {
+        const metrics = [mainMetric, ...secondaryMetrics].filter(
             m => m.column && m.aggregation
         );
-		const selectParts = [
-			mainDimension,
-			...metrics.map(
-				m => `${m.aggregation.toLowerCase()}(${m.column}) AS ${m.aggregation.toLowerCase()}_${m.column}`
-			)
-		];
-		return `
+        const selectParts = [
+            mainDimension,
+            ...metrics.map(
+                m => `${m.aggregation.toLowerCase()}(${m.column}) AS ${m.aggregation.toLowerCase()}_${m.column}`
+            )
+        ];
+        return `
             SELECT
                 ${selectParts.join(",\n  ")}
             FROM ${dataset}
+            ${whereClause}
             GROUP BY ${mainDimension}
         `.trim();
-	}
+    }
 
-	// CASE 3: No dimension, simple aggregation
-	return `
+    // CASE 3: No dimension, simple aggregation
+    return `
         SELECT ${mainAgg}(${mainMetric.column}) AS ${mainAgg}_${mainMetric.column}
         FROM ${dataset}
-	`.trim();
+        ${whereClause}
+    `.trim();
 }
-
-
 
 
 export async function runChartQuery(chartQuery) {
@@ -168,7 +179,8 @@ export function buildOptionsFromUI({
     secondaryMetrics,
     seriesList,
     dimensionOnXAxis,
-    chartProperties
+    chartProperties,
+    theme = 'light' // default to light mode
 }) {
     if (!mainDimension || !mainMetric || !seriesList) {
         return {};
@@ -176,6 +188,14 @@ export function buildOptionsFromUI({
 
     const xAxisField = dimensionOnXAxis ? mainDimension : mainMetric.column;
     const yAxisField = dimensionOnXAxis ? mainMetric.column : mainDimension;
+
+    // Define theme-aware selection style
+    const selectItemStyle = {
+        borderColor: theme === 'dark' ? '#fff' : '#000',
+        borderWidth: 2,
+        shadowBlur: 8,
+        shadowColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)'
+    };
 
     return {
         dataset: {
@@ -206,7 +226,33 @@ export function buildOptionsFromUI({
             encode: {
                 x: dimensionOnXAxis ? series.column : mainDimension,
                 y: dimensionOnXAxis ? mainDimension : series.column,
+            },
+            select: {
+                itemStyle: selectItemStyle
+            },
+            selectedMode: 'single',
+            emphasis: {
+                focus: 'self'
             }
         }))
     };
 }
+
+export function extractDatasetFromChartConfiguration(chartConfiguration: any): string | null {
+    if (!chartConfiguration?.type) return null;
+  
+    if (chartConfiguration.type === 'ui') {
+      return chartConfiguration.configuration?.dataset ?? null;
+    }
+  
+    if (chartConfiguration.type === 'advanced') {
+      const query: string = chartConfiguration.configuration?.query ?? '';
+      const match = query.match(/from\s+([`"]?[\w.]+[`"]?)/i); // capture table after FROM
+  
+      if (match && match[1]) {
+        return match[1].replace(/[`"]/g, ''); // remove backticks/quotes
+      }
+    }
+  
+    return null;
+  }

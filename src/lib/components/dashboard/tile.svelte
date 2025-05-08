@@ -4,27 +4,120 @@
     import * as echarts from "echarts";
     import { resize } from "@svelte-put/resize";
     import { cn } from "$lib/utils.js";
-    import { onMount } from "svelte";
+    import { onMount, onDestroy, tick } from "svelte";
     import TileEditBar from "$lib/components/dashboard/tile_edit_bar.svelte";
-    import { buildChartQuery, buildOptionsFromUI } from "$lib/utils/charts_utils";
     import { mode } from "mode-watcher";
+    import { 
+        buildChartQuery, 
+        buildOptionsFromUI, 
+        extractDatasetFromChartConfiguration 
+    } from "$lib/utils/charts_utils";
+    import { getContext } from 'svelte';
+
 
     let { remove, dataItem = $bindable(), editMode, onUpdate } = $props();
+    let lastHighlighted = $state(null);
     let chart = $state();
     let chartContainer = $state();
     let datasetRows = writable([]);
     let chartConfiguration = $state(dataItem?.chartConfiguration || {});
+    let datasetName = $state();
     let initializedChart = $state(false);
+    let filtersStore = getContext('filters');
+    let chartFilters = $state([]);
 
-    
     onMount(async () => {
         chart = echarts.init(chartContainer, $mode === 'dark' ? 'dark' : undefined);
+        datasetName = extractDatasetFromChartConfiguration(dataItem?.chartConfiguration);
         if (chartConfiguration?.type) {
             await refreshTile();
         }
+        chart.on('click', (params) => {
+            console.log('chart clicked:', params);
+            const dimensionCandidates = params.dimensionNames.filter(name => name !== params.seriesName);
+            const filterDimension = dimensionCandidates[0];
+            const filterValue = params.value[filterDimension];
+
+            const filter = {
+                tileID: dataItem?.id,
+                datasetName: datasetName,
+                column: filterDimension,
+                value: filterValue,
+                dispatchEvent: {
+                    seriesIndex:params.seriesIndex,
+                    dataIndex:params.dataIndex,
+                }
+            };
+
+            filtersStore.update((current) => {
+                const existsInFiltersStore = current.some(
+                    (f) => (
+                        f.tileID === filter.tileID &&
+                        f.datasetName === filter.datasetName &&
+                        f.column === filter.column &&
+                        f.value === filter.value
+                    )
+                );
+                return existsInFiltersStore ? current : [...current, filter];
+            });
+            const existsInChartFilters = chartFilters.some(
+                (f) => (
+                    f.tileID === filter.tileID &&
+                    f.datasetName === datasetName &&
+                    f.column === filter.column &&
+                    f.value === filter.value
+                )
+            );
+            if (!existsInChartFilters) {
+                chartFilters = [...chartFilters, filter];
+            }
+        });
+        await tick();
+        // Subscribe to the filter store *after* the component has mounted
+        const unsubscribe = filtersStore.subscribe((filters) => {
+            // Filter only those relevant to this tile
+            const activeFilters = filters.filter(
+                (f) => (
+                    f.datasetName === datasetName &&
+                    f.tileID !== dataItem?.id
+                )
+            );
+            console.log(`DEBUG activeFilters for tile ${dataItem?.id}: `, activeFilters);
+
+            // Rebuild query if filters changed
+            if (initializedChart && activeFilters.length > 0) {
+                refreshQueryWithFilters(activeFilters);
+            } else if (initializedChart && activeFilters.length === 0) {
+                refreshTile();
+            }
+            
+        });
         initializedChart = true;
-        return () => chart.dispose();
+        return () => {
+            unsubscribe?.();
+            chart.dispose();
+        };
     });
+
+    function refreshQueryWithFilters(activeFilters) {
+        let sqlQuery;
+        let chartOptions;
+        if (dataItem?.chartConfiguration.type === "ui") {
+            sqlQuery = buildChartQuery(dataItem.chartConfiguration.configuration, activeFilters);
+            chartOptions = buildOptionsFromUI(
+                {...dataItem?.chartConfiguration.configuration, theme:$mode})
+        } else {
+            const { sqlQuery, chartOptions } = dataItem?.chartConfiguration.configuration;
+        }
+		applyFiltersOnTile(sqlQuery, chartOptions);
+	}
+
+    export function unselect(filter) {
+        chart?.dispatchAction({
+            type: 'unselect',
+            ...filter.dispatchEvent
+        });
+	}
 
     mode.subscribe(
         theme => {
@@ -33,7 +126,7 @@
             }
         }
     )
-
+    
     function reinitChart() {
         disposeOfChart();   // clean current chart
         chart = echarts.init(chartContainer, $mode === 'dark' ? undefined : 'dark');
@@ -80,6 +173,16 @@
         }
     }
 
+    async function applyFiltersOnTile(sqlQuery, chartOptions) {
+        const rows = await getDatasetFromQuery(sqlQuery);
+        datasetRows.set(rows);
+        const fullChartOptions = {
+            ...chartOptions,
+            dataset: { source: $datasetRows }
+        };
+        chart.setOption(fullChartOptions);
+    }
+
     async function refreshTile() {
         if (chartConfiguration.type === "advanced") {
             const { sqlQuery, chartOptions } = chartConfiguration.configuration;
@@ -93,7 +196,8 @@
         } else {
             const sqlQuery = buildChartQuery(chartConfiguration.configuration);
             const rows = await getDatasetFromQuery(sqlQuery);
-            const UIChartOptions = buildOptionsFromUI(chartConfiguration.configuration)
+            const UIChartOptions = buildOptionsFromUI(
+                {...chartConfiguration.configuration, theme:$mode})
             datasetRows.set(rows);
             const fullChartOptions = {
                 ...UIChartOptions,
