@@ -1,55 +1,77 @@
 <script lang="ts">
-	import '../app.css';
-	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
-	import AppSidebar from "$lib/components/app-sidebar.svelte";
-	import SiteHeader from "$lib/components/header.svelte";
-	import { ModeWatcher } from "mode-watcher";
-	import { onMount } from 'svelte';
-	import { loadData } from "$lib/utils/duckdb";
-	import { DoubleBounce } from 'svelte-loading-spinners';
-	import * as Card from "$lib/components/ui/card/index.js";
-	import { initializeAppStores } from '$lib/utils/stores';
-	import { loadConfig } from '$lib/utils/odv_config';
+  import "../app.css";
+  import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+  import AppSidebar from "$lib/components/app-sidebar.svelte";
+  import SiteHeader from "$lib/components/header.svelte";
+  import { ModeWatcher } from "mode-watcher";
+  import { onMount } from "svelte";
+  import { loadData } from "$lib/utils/duckdb";
+  import { DoubleBounce } from "svelte-loading-spinners";
+  import * as Card from "$lib/components/ui/card/index.js";
+  import { initializeAppStores } from "$lib/utils/stores";
+  import { loadConfig } from "$lib/utils/odv_config";
+  import { Toaster, toast } from "svelte-sonner";
+  import { dataLoaded } from '$lib/utils/stores';
 
-	let { children } = $props();
 
-	let appReadyPromise = (async () => {
-		await loadConfig();
-		await loadData();
-		initializeAppStores();
-	})();
+  let { children } = $props();
+  let appReady = $state(false);
+  let error: Error | null = $state(null);
+
+  // Initialize theme for JS
+  onMount(async () => {
+    try {
+      await loadConfig();
+      initializeAppStores();
+      appReady = true;
+      toast.loading("Loading data...");
+      loadData()
+        .then(() => {
+          dataLoaded.set(true);
+          toast.success("Data loaded successfully");
+        })
+        .catch((e) => {
+          console.error("loadData() failed:", e);
+          toast.error("Failed to load data");
+        });
+    } catch (e) {
+      error = e as Error;
+    }
+  });
 </script>
 
-{#await appReadyPromise}
-	<!-- loading UI -->
-	<div class="flex items-center justify-center h-screen w-screen">
-		<Card.Root>
-			<Card.Header>
-				<Card.Title>App is Loading..</Card.Title>
-			</Card.Header>
-			<Card.Content>
-				<div class="flex items-center justify-center">
-					<DoubleBounce size="60" color="#FF3E00" />
-				</div>
-			</Card.Content>
-		</Card.Root>
-	</div>
-{:then}
-	<Sidebar.Provider open={false}>
-		<ModeWatcher />
-		<AppSidebar />
-		<div>
-			<SiteHeader />
-			<main>
-				<div class="w-screen h-screen shadow-md" id="page">
-					{@render children?.()}
-				</div>
-			</main>
-		</div>
-	</Sidebar.Provider>
-{:catch error}
-	<!-- fallback if any step fails -->
-	<div class="p-4 text-red-600 font-semibold">
-		Something went wrong: {error.message}
-	</div>
-{/await}
+<Toaster />
+{#if !appReady && !error}
+  <!-- loading screen -->
+  <div
+    class="flex items-center justify-center h-screen w-screen"
+  >
+    <Card.Root>
+      <Card.Header>
+        <Card.Title>App is Loading...</Card.Title>
+      </Card.Header>
+      <Card.Content>
+        <div class="flex items-center justify-center">
+          <DoubleBounce size="60" color="#FF3E00" />
+        </div>
+      </Card.Content>
+    </Card.Root>
+  </div>
+{:else if error}
+  <div class="p-4 text-red-600 font-semibold">
+    Something went wrong: {error.message}
+  </div>
+{:else}
+  <Sidebar.Provider open={false}>
+    <ModeWatcher />
+    <AppSidebar />
+    <div>
+      <SiteHeader />
+      <main>
+        <div class="w-screen h-screen shadow-md" id="page">
+          {@render children?.()}
+        </div>
+      </main>
+    </div>
+  </Sidebar.Provider>
+{/if}

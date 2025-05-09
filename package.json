@@ -41,6 +41,7 @@
 		"svelte-codemirror-editor": "^1.4.1",
 		"svelte-grid": "^5.1.2",
 		"svelte-jsoneditor": "^2.3.3",
+		"svelte-sonner": "^0.3.28",
 		"yaml": "^2.7.0"
 	}
 }

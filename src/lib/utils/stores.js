@@ -4,6 +4,8 @@ import { getDashboards, getDataApps } from '$lib/utils/odv_config.js'
 // Initial index state for dashboards, data sources
 export const dashboardsIndex = writable([]);
 export const dataAppsIndex = writable([]);
+export const dataLoaded = writable(false);
+
 
 /**
  * Adds a new dashboard object to the dashboardsIndex store.
