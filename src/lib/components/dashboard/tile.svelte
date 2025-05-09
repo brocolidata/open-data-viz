@@ -13,6 +13,7 @@
         extractDatasetFromChartConfiguration 
     } from "$lib/utils/charts_utils";
     import { getContext } from 'svelte';
+    import { dataLoaded } from '$lib/utils/stores';
 
 
     let { remove, dataItem = $bindable(), editMode, onUpdate } = $props();
@@ -29,7 +30,7 @@
     onMount(async () => {
         chart = echarts.init(chartContainer, $mode === 'dark' ? 'dark' : undefined);
         datasetName = extractDatasetFromChartConfiguration(dataItem?.chartConfiguration);
-        if (chartConfiguration?.type) {
+        if (chartConfiguration?.type && $dataLoaded) {
             await refreshTile();
         }
         chart.on('click', (params) => {
@@ -85,9 +86,9 @@
             console.log(`DEBUG activeFilters for tile ${dataItem?.id}: `, activeFilters);
 
             // Rebuild query if filters changed
-            if (initializedChart && activeFilters.length > 0) {
+            if (initializedChart && activeFilters.length > 0 && $dataLoaded) {
                 refreshQueryWithFilters(activeFilters);
-            } else if (initializedChart && activeFilters.length === 0) {
+            } else if (initializedChart && activeFilters.length === 0 && $dataLoaded) {
                 refreshTile();
             }
             
@@ -123,6 +124,13 @@
         theme => {
             if (initializedChart) {
                 reinitChart();
+            }
+        }
+    )
+    dataLoaded.subscribe(
+        isLoaded => {
+            if (isLoaded) {
+                refreshTile()
             }
         }
     )
