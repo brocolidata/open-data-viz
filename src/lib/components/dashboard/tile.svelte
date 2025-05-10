@@ -74,25 +74,28 @@
             }
         });
         await tick();
-        // Subscribe to the filter store *after* the component has mounted
-        const unsubscribe = filtersStore.subscribe((filters) => {
-            // Filter only those relevant to this tile
-            const activeFilters = filters.filter(
-                (f) => (
-                    f.datasetName === datasetName &&
-                    f.tileID !== dataItem?.id
-                )
-            );
-            console.log(`DEBUG activeFilters for tile ${dataItem?.id}: `, activeFilters);
+        if (filtersStore) {
+            // Subscribe to the filter store *after* the component has mounted
+            const unsubscribe = filtersStore.subscribe((filters) => {
+                // Filter only those relevant to this tile
+                const activeFilters = filters.filter(
+                    (f) => (
+                        f.datasetName === datasetName &&
+                        f.tileID !== dataItem?.id
+                    )
+                );
+                console.log(`DEBUG activeFilters for tile ${dataItem?.id}: `, activeFilters);
 
-            // Rebuild query if filters changed
-            if (initializedChart && activeFilters.length > 0 && $dataLoaded) {
-                refreshQueryWithFilters(activeFilters);
-            } else if (initializedChart && activeFilters.length === 0 && $dataLoaded) {
-                refreshTile();
-            }
-            
-        });
+                // Rebuild query if filters changed
+                if (initializedChart && activeFilters.length > 0 && $dataLoaded) {
+                    refreshQueryWithFilters(activeFilters);
+                } else if (initializedChart && activeFilters.length === 0 && $dataLoaded) {
+                    refreshTile();
+                }
+                
+            });
+        }
+        
         initializedChart = true;
         return () => {
             unsubscribe?.();

@@ -15,8 +15,9 @@
     } from "$lib/utils/grid_utils.ts";
 
     let {
-        dashboardName=$bindable(""),
-        dataAppName=""
+        dashboardName=$bindable(),
+        dataAppName="",
+        onSave
     } = $props()
 
     const COLS = 6;
@@ -30,7 +31,12 @@
     let dashboard = $state({});
     let dashboardLabel = $state("");
     let dashboardDescription = $state("");
-    let dashboardState = $state({});
+    let dashboardState = $derived({
+        name:labelToName(dashboardLabel),
+        label:dashboardLabel,
+        description:dashboardDescription,
+        tiles:items
+    });
     let items = $derived.by(() => {
         if (dashboard?.tiles) {
             return dashboard.tiles.map((tile) => ({
@@ -42,31 +48,21 @@
         }
     })
     // svelte-ignore state_referenced_locally
-    let { definition_source, ...cleanDashboard } = dashboard || {};
-    // let dashboardState = $state(cleanDashboard);
+    // let { definition_source, ...cleanDashboard } = dashboard || {};
     onMount(() => {
         if (dashboardName) {
             dashboard = getDashboardByName(dashboardName);
             if (dashboard) {
                 dashboardLabel = dashboard.label;
                 dashboardDescription = dashboard.description;
-                let { definition_source, ...cleanDashboard } = dashboard || {};
+                // let { definition_source, ...cleanDashboard } = dashboard || {};
+                let { definition_source, ...cleanDashboard } = dashboard;
                 dashboardState = cleanDashboard;
             }
         }
         toggleEdit(); // ensure attributes are set based on editMode
     });
-
-    // $effect(() => {
-    //     if (dashboard?.tiles) {
-    //         items = dashboard.tiles.map((tile) => ({
-    //             ...tile,
-    //             [6]: gridHelp.item(tile[6] || { x: 0, y: 0, w: 2, h: 2 }),
-    //         }));
-    //     } else {
-    //         items = [];
-    //     }
-    // });
+    $inspect('DEBUG dashboardState: ', dashboardState);
 
     function toggleEdit() {
         items = toggleEditInTiles(items, COLS, editMode);
@@ -81,12 +77,13 @@
     }
 
     function saveDashboard() {
-        isSaving = true;
-        createDashboard(dashboardState);
+        // dashboardName = labelToName(dashboardLabel);
+        onSave(dashboardState);
         console.log(`Successfully saved ${dashboardLabel} dashboard.`);
     }
 
     function updateTile(updated) {
+        console.log('DEBUG BIG BUG ; items: ', items);
         items = updateTileHelper(items, updated);
     }
 
@@ -94,7 +91,7 @@
 
 <!-- <GridPage /> -->
 
-<DashboardEditBar
+<!-- <DashboardEditBar
     bind:editMode
     bind:isSaving
     bind:dashboardLabel
@@ -103,6 +100,17 @@
     {addTile}
     {COLS}
     onEditModeToggle={toggleEdit}
+    onSave={saveDashboard}
+/> -->
+<DashboardEditBar
+    bind:editMode
+    bind:dashboardLabel
+    bind:dashboardDescription
+    {dashboardState}
+    {addTile}
+    {COLS}
+    onEditModeToggle={toggleEdit}
+    onSave={saveDashboard}
 />
 
 <div class="flex items-center justify-between space-y-2 ps-8 pt-3">
