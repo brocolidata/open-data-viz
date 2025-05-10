@@ -135,7 +135,7 @@ export function getDashboardsForDataApp(dashboardNames) {
 
 export function addDashboardToDataApp(dataAppName, dashboardName) {
   dataAppsIndex.update((currentDataApps) => {
-    const index = currentDataApps.findIndex(
+    const dataAppIndex = currentDataApps.findIndex(
       (dataApp) => dataApp.name === dataAppName
     );
 

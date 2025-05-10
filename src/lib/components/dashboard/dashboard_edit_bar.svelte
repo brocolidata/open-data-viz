@@ -24,30 +24,31 @@
         dashboardState,
         addTile,
         COLS,
-        onEditModeToggle
+        onEditModeToggle,
+        onSave
     } = $props();
 
-    let dashboardDefinitionSource = $derived(dashboardState.definition_source)
+    // let dashboardDefinitionSource = $derived(dashboardState?.definition_source || 'in memory');
     let disableSave = $state(false);
     let dashboardExport = $derived(getExportableDashboardState(dashboardState, COLS));
     let saveSuccess = $state(false);
     let openExportConfigDrawer = $state(false);
 
-    onMount(() => {
-		if (dashboardDefinitionSource === "configuration file") {
-            disableSave = true;
-        }
-	});
+    // onMount(() => {
+	// 	if (dashboardDefinitionSource === "configuration file") {
+    //         disableSave = true;
+    //     }
+	// });
 
     
 
     async function saveDashboard() {
         isSaving = true;
+        onSave();
         console.log(`Successfully saved ${dashboardLabel} dashboard.`);
 
         // Trigger animation
         saveSuccess = true;
-
         // Reset to original after 2 seconds
         setTimeout(() => {
             saveSuccess = false;
