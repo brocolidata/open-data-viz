@@ -40,6 +40,8 @@
     let secondaryMetrics = $state(configuration?.secondaryMetrics || []);
     let seriesList = $state(configuration?.seriesList || []);
     let dimensionOnXAxis = $state(configuration?.dimensionOnXAxis ?? true);
+    // svelte-ignore state_referenced_locally
+    let previousDataSource = $state(dataSource);
 
     // Configuration validation state
     let configIsInvalid = $state(false);
@@ -77,7 +79,12 @@
         console.log("Config Is Invalid:", configIsInvalid);
         disableSave = configIsInvalid
     });
-
+    $effect(() => {
+        if (dataSource !== previousDataSource) {
+            updateColumns();
+            previousDataSource = dataSource
+        }
+    })
     // Function to refetch column options when dataSource changes
     async function updateColumns() {
         if (dataSource) {
@@ -108,7 +115,8 @@
             seriesList,
             dimensionOnXAxis,
             chartProperties
-        }        
+        }
+        previousDataSource = dataSource
         onSave();
         
         // Trigger animation
@@ -153,7 +161,6 @@
             boxOptions={dataSourceOptions}
             objectName="data source"
             bind:value={dataSource}
-            onValueChange={updateColumns}
         />
     </div>
     <div class="py-2">

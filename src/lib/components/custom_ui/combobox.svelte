@@ -11,7 +11,6 @@
         boxOptions, 
         objectName, 
         value=$bindable(), 
-        onValueChange 
     } = $props();
     let open = $state(false);
     let triggerRef = $state<HTMLButtonElement>(null!);
@@ -40,19 +39,20 @@
                 role="combobox"
                 aria-expanded={open}
             >
-                {selectedValue || `Select..`}
+                <span class="truncate">
+                    {selectedValue || `Select ${objectName}...`}
+                </span>
                 <ChevronsUpDown class="ml-2 size-4 shrink-0 opacity-50" />
             </Button>
         {/snippet}
     </Popover.Trigger>
     <Popover.Content class="w-full p-0">
-        <!-- <Command.Root onValueChange={() => {onUpdate()}}> -->
-        <Command.Root {onValueChange}>
+        <Command.Root>
             <Command.Input placeholder="Search {objectName}..." />
             <Command.List>
                 <Command.Empty>No {objectName} found.</Command.Empty>
-                <Command.Group>
-                    {#each boxOptions as option}
+                <Command.Group value="options">
+                    {#each boxOptions as option (option.value)}
                         <Command.Item
                             value={option.value}
                             onSelect={() => {
