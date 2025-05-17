@@ -40,6 +40,8 @@
     let secondaryMetrics = $state(configuration?.secondaryMetrics || []);
     let seriesList = $state(configuration?.seriesList || []);
     let dimensionOnXAxis = $state(configuration?.dimensionOnXAxis ?? true);
+    // svelte-ignore state_referenced_locally
+    let previousDataSource = $state(dataSource);
 
     // Configuration validation state
     let configIsInvalid = $state(false);
@@ -78,11 +80,11 @@
         disableSave = configIsInvalid
     });
     $effect(() => {
-        if (dataSource) {
+        if (dataSource !== previousDataSource) {
             updateColumns();
+            previousDataSource = dataSource
         }
     })
-
     // Function to refetch column options when dataSource changes
     async function updateColumns() {
         if (dataSource) {
@@ -113,7 +115,8 @@
             seriesList,
             dimensionOnXAxis,
             chartProperties
-        }        
+        }
+        previousDataSource = dataSource
         onSave();
         
         // Trigger animation

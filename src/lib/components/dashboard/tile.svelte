@@ -132,7 +132,7 @@
     )
     dataLoaded.subscribe(
         isLoaded => {
-            if (isLoaded) {
+            if (isLoaded && initializedChart) {
                 refreshTile()
             }
         }
