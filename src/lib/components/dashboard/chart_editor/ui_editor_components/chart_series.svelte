@@ -4,7 +4,6 @@
 	import Button from "$lib/components/ui/button/button.svelte";
 	import Label from "$lib/components/ui/label/label.svelte";
 	import Switch from "$lib/components/ui/switch/switch.svelte";
-	import Combobox from "$lib/components/custom_ui/combobox.svelte";
 	import { inferSeries, getDataColumnsOptions } from "$lib/utils/charts_utils";
 
 	let {

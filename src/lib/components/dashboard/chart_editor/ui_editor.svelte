@@ -77,6 +77,11 @@
         console.log("Config Is Invalid:", configIsInvalid);
         disableSave = configIsInvalid
     });
+    $effect(() => {
+        if (dataSource) {
+            updateColumns();
+        }
+    })
 
     // Function to refetch column options when dataSource changes
     async function updateColumns() {
@@ -153,7 +158,6 @@
             boxOptions={dataSourceOptions}
             objectName="data source"
             bind:value={dataSource}
-            onValueChange={updateColumns}
         />
     </div>
     <div class="py-2">
